@@ -1,0 +1,21 @@
+3. var breaks -> sim("/controls/flight/speedbreak")
+4. var throttle -> sim("/controls/engines/current-engine/throttle")
+5. var heading <- sim("/instrumentation/heading-indicator/offset-deg")
+6. var airspeed<-sim("/instrumentation/airspeed-indicator/indicated-speed-kt")
+7. var roll <- sim("/instrumentation/attitude-indicator/indicated-roll-deg")
+8. var pitch <- sim("/instrumentation/attitude-indicator/internal-pitch-deg")
+9. var rudder <- sim("/controls/flight/rudder")
+10. var aileron <- sim("/controls/flight/aileron")
+11. var elevator <- sim("/controls/flight/elevator")
+12. var alt <- sim("/instrumentation/altimeter/indicated-altitude-ft")
+13. breaks = 0
+14. throttle = 1
+15. var h0 = heading
+16. while alt < 1000 {
+17. rudder = (h0 – heading)/20
+18. aileron = - roll / 70
+19. elevator = pitch / 50
+20. Print(alt)
+21. Sleep(250)
+22. }
+23. Print("done")
