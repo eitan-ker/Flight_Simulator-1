@@ -11,21 +11,8 @@
 #include <regex>
 using namespace std;
 
-class Command {
-  virtual int execute(string str) = 0;
-};
-class ConnectCommand : Command {
-  int execute(string str) {
 
-  }
-  ~ConnectCommand();
-};
-class OpenServerCommand : Command {
-int execute(string str) {
 
-}
-~OpenServerCommand();
-};
 class DefineVarCommand : Command {
 int execute(string str) {
 
