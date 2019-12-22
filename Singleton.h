@@ -16,17 +16,18 @@
 #include <regex>
 #include <sstream>
 using namespace std;
+
 class Singleton {
- private:
-  vector<string> str_array;
-  map<string,Command> strToCommandMap;
-  map<string,Command> strToCommandMap;
-  map<string,Var_Data> symbolTable;
-  static Singleton* instance;
-  Singleton() {}
- public:
-  static Singleton *getInstance();
-  vector<string>& getVector();
+private:
+    vector<string> str_array;
+    map<string,Command*> strToCommandMap;
+   // map<string,Var_Data> symbolTable;
+    static Singleton* instance;
+    Singleton(); // will be called only when calling getInstance
+public:
+    static Singleton *getInstance();
+    vector<string>& getVector();
+    map<string,Command*> getCommandMap();
 };
 
 #endif //FLIGHTSIMULATOR__SINGLETON_H_
