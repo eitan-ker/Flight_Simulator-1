@@ -1,7 +1,5 @@
 // Copyright 2019 Meni Ashurov
 
-#ifndef FLIGHTSIMULATOR__MAIN_H_
-#define FLIGHTSIMULATOR__MAIN_H_
 #include <fstream>
 #include <map>
 #include <iterator>
@@ -12,13 +10,13 @@
 #include <fstream>
 #include <regex>
 #include <sstream>
+#include "Singleton.h"
 using namespace std;
 
 void check_line(string &line, vector<string> &str_array);
 void lexer(const char* file_path, vector<string> &str_array);
 void parser(vector<string> &str_array);
 int main(int argc, char* argv[]);
-#endif //FLIGHTSIMULATOR__MAIN_H_
 
 void check_line(string &line, vector<string> &str_array) {
   const char* token = &(line[0]);
@@ -126,13 +124,14 @@ void lexer(const char* file_path, vector<string> &str_array) {
   }
 }
 void parser(vector<string> &str_array) {
+  int i = 0;
 
 }
 int main(int argc, char* argv[]) {
-
+  Singleton *database=database->getInstance() ;
   vector<string> str_array;
-  lexer(argv[1], str_array);
-  parser(str_array);
+  lexer(argv[1], database->getVector());
+  parser(database->getVector());
   return 0;
 }
 
