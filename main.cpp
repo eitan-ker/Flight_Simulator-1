@@ -16,7 +16,7 @@ using namespace std;
 
 void check_line(string &line, vector<string> &str_array);
 void lexer(const char* file_path, vector<string> &str_array);
-void parser(char *str_array[]);
+void parser(vector<string> &str_array);
 int main(int argc, char* argv[]);
 #endif //FLIGHTSIMULATOR__MAIN_H_
 
@@ -45,6 +45,10 @@ void check_line(string &line, vector<string> &str_array) {
   }*/
   start = token;
   while (*token!='\0' && *token!='\n') {
+    if(*token=='\t') {
+      token++;
+      start=token;
+    }
     if(encounterlotofspaces==1) {
       start=check_space;
       token=check_space;
@@ -121,13 +125,14 @@ void lexer(const char* file_path, vector<string> &str_array) {
     cout << e << endl;
   }
 }
-void parser(char *str_array[]) {
+void parser(vector<string> &str_array) {
 
 }
 int main(int argc, char* argv[]) {
 
   vector<string> str_array;
   lexer(argv[1], str_array);
+  parser(str_array);
   return 0;
 }
 
