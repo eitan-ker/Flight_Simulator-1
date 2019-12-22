@@ -1,5 +1,24 @@
 // Copyright 2019 Meni Ashurov
 
+#ifndef FLIGHTSIMULATOR__MAIN_H_
+#define FLIGHTSIMULATOR__MAIN_H_
+#include <fstream>
+#include <map>
+#include <iterator>
+#include <string>
+#include <iostream>
+#include <list>
+#include <utility>
+#include <fstream>
+#include <regex>
+#include <sstream>
+using namespace std;
+
+void check_line(string &line, vector<string> &str_array);
+void lexer(const char* file_path, vector<string> &str_array);
+void parser(char *str_array[]);
+int main(int argc, char* argv[]);
+#endif //FLIGHTSIMULATOR__MAIN_H_
 
 void check_line(string &line, vector<string> &str_array) {
   const char* token = &(line[0]);
@@ -14,7 +33,7 @@ void check_line(string &line, vector<string> &str_array) {
       return;
     }
   }
-  while (*token != '\0' && passednumberingflag==0) {
+  /*while (*token != '\0' && passednumberingflag==0) {
     token++;
     if (isalpha(*token) || *token == '}' ) {
       if (!regex_match(start, token, r1)) {
@@ -23,7 +42,7 @@ void check_line(string &line, vector<string> &str_array) {
       }
       passednumberingflag=1;
     }
-  }
+  }*/
   start = token;
   while (*token!='\0' && *token!='\n') {
     if(encounterlotofspaces==1) {
