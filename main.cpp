@@ -1,68 +1,18 @@
 // Copyright 2019 Meni Ashurov
-#include <fstream>
-#include <map>
-#include <string>
-#include <iostream>
-#include <list>
-#include <utility>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <regex>
-using namespace std;
 
-class Command {
-  virtual int execute(string str) = 0;
-};
-class ConnectCommand : Command {
-  int execute(string str) {
 
-  }
-  ~ConnectCommand();
-};
-class OpenServerCommand : Command {
-int execute(string str) {
-
-}
-~OpenServerCommand();
-};
-class DefineVarCommand : Command {
-int execute(string str) {
-
-}
-~DefineVarCommand();
-};
-class Var_Data {
-
- private:
-  double _value;
-  string _sim;
-
- public:
-  Var_Data(double value, string sim) :
-      _value(value), _sim(sim) {}
-      string get_sim() {
-        return this->_sim;
-      }
-      void set_sim(string sim) {
-        this->_sim = sim;
-      }
-  double get_value() {
-    return this->_value;
-  }
-  void set_value(double value) {
-    this->_value = value;
-  }
-  ~Var_Data(){}
-};
 void check_line(string &line, vector<string> &str_array) {
   const char* token = &(line[0]);
-  const char* start = token;;
-  int i = 0, passednumberingflag = 0;
+  const char* start = token;
+  const char* check_space=token;
+  int i = 0, passednumberingflag = 0, foundpattern = 0, astrophesflag=0,enterstringtoarray=0,counter=0,encounterlotofspaces=0;
   string c;
-  regex r1("[1-9]*[.][ ]");
+  regex r1("[0-9]*[.][ ]");
   if (*token == '/') {
-    return;
+    token++;
+    if (*token == '/') {
+      return;
+    }
   }
   while (*token != '\0' && passednumberingflag==0) {
     token++;
@@ -75,27 +25,66 @@ void check_line(string &line, vector<string> &str_array) {
     }
   }
   start = token;
-  if (*token == '}') {
-    return;
+  while (*token!='\0' && *token!='\n') {
+    if(encounterlotofspaces==1) {
+      start=check_space;
+      token=check_space;
+      counter=0;
+    }
+    if(*token == ' ' || *token == '(' || *token == ')' || *token == ',' ) {
+      foundpattern=1;
+      if(*token == ' ') {
+        check_space = token;
+        check_space++;
+        while(*check_space==' ') {
+          check_space++;
+          counter++;
+        }
+        if(counter>0) {
+          foundpattern=0;
+          encounterlotofspaces=1;
+        }
+      }
+    }
+    if ((int)*token==34 && astrophesflag==0) {
+      astrophesflag++;
+      token++;
+      start=token;
+    }
+    if((int)*token==34 && astrophesflag==1) {
+      astrophesflag++;
+    }
+    if (astrophesflag==2) {
+      foundpattern=1;
+    }
+    if(foundpattern==1) {
+      foundpattern=0;
+      enterstringtoarray=1;
+      string key_str(start,token);
+      c= key_str;
+      if(c.compare("////") != 0 && c.compare("") != 0) {
+        str_array.insert(str_array.end(), c);
+        token++;
+        start = token;
+      } else {
+        return; //encounter comment
+      }
+      if(astrophesflag==2) {
+        token++;
+        start=token;
+        foundpattern=0;
+      }
+    }
+    if(enterstringtoarray==0) {
+      token++;
+    } else {
+      enterstringtoarray=0;
+    }
   }
-  start = token;
-  while (*token!='\0' ||  *token!='/') {
-    if(*token=="") {
-      token++;
-    }
-    if (*token == '(' || *token == ' ') {
-      string key_str(start,token);
-      c= key_str;
-      str_array.insert(str_array.end(),c);
-      token++;
-      start=token;
-    } else if (*token == ')') {
-      string key_str(start,token);
-      c= key_str;
-      str_array.insert(str_array.end(),c);
-      start=token;
-    }
-    token++;
+  string key_str(start,token);
+  if(start!=token && *start!='\0') {
+    c = key_str;
+    str_array.insert(str_array.end(), c);
   }
 }
 void lexer(const char* file_path, vector<string> &str_array) {
