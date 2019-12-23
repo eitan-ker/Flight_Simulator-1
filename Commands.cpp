@@ -1,17 +1,15 @@
 //file to write all Commands implementation
-#include Command.h
-#include "ConnectCommand.h"
-#include "OpenServerCommand.h"
-/*#include DefineVarCommand.h
-#include LoopCommand.h
-#include SleepCommand.h*/
+#include "Command.h"
 
-ConnectCommand:: execute() {
-  //here will be implemetation of ConnectCommand execute method
+int OpenServerCommand :: execute(string str) {
 
 }
+OpenServerCommand ::~OpenServerCommand() {}
 
-OpenServerCommand:: execute() {
-  //here will be implemetation of OpenServerCommand execute method
 
+int ConnectCommand :: execute(string str) {
+return 1;
 }
+
+ConnectCommand ::~ConnectCommand() {}
+
