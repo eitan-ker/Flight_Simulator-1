@@ -8,48 +8,48 @@ using namespace std;
 
 class Command {
  public:
-  virtual int execute(string str[]) = 0;
-  virtual ~Command()= default;
+  virtual int execute(vector<string> &str, int i) = 0;
+  virtual ~Command(){}
 };
 
 class ConnectCommand : public Command {
-  int execute(string str[]) override;
-  ~ConnectCommand() override;
+  virtual int execute(vector<string> &str, int i);
+  virtual ~ConnectCommand(){};
 };
 
 class OpenServerCommand: public Command {
-  int execute(string str[]) override;
-  ~OpenServerCommand() override;
+  virtual int execute(vector<string> &str, int i);
+  virtual ~OpenServerCommand(){};
 };
 
 class DefineVarCommand : public Command {
  public:
-  virtual int execute(string str[]);
+  virtual int execute(vector<string> &str, int i);
   void addTosymbolTable(string key, Var_Data value);
-  ~DefineVarCommand(){};
+  virtual ~DefineVarCommand(){};
 };
 
 class SimCommand : public Command {
  public:
-  virtual int execute(string str[]);
+  virtual int execute(vector<string> &str, int i);
   virtual ~SimCommand(){};
 };
 
 class setToClientCommand : public Command {
  public:
-  virtual int execute(string str[]);
+  virtual int execute(vector<string> &str, int i);
   ~setToClientCommand(){};
 };
 
 class setToSimulatorCommand : public Command {
  public:
-  virtual int execute(string str[]);
+  virtual int execute(vector<string> &str, int i);
   virtual ~setToSimulatorCommand(){};
 };
 
 class assignCommand : public Command {
  public:
-  virtual int execute(string str[]);
+  virtual int execute(vector<string> &str, int i);
   virtual ~assignCommand(){};
 };
 
