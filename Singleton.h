@@ -35,6 +35,13 @@ class Singleton {
   map<string,Command*>& getCommandMap();
   map<string,double>& getgeneric_smallMap();
   vector<string>& getArrayOfOrdersToServer();
+  ~Singleton(){
+    map<string,Command*>:: iterator it=strToCommandMap.begin();
+    for(;it!=strToCommandMap.end(); ++it) {
+      delete it->second;
+      it->second= nullptr;
+    }
+  }
 };
 
 #endif //FLIGHTSIMULATOR__SINGLETON_H_
