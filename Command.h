@@ -53,6 +53,24 @@ class assignCommand : public Command {
   virtual int execute(vector<string> &str, int i);
   virtual ~assignCommand(){};
 };
+/* TODO
+class SleepCommand : public Command {
+ public:
+  virtual int execute(vector<string> &str, int i);
+  virtual ~SleepCommand(){};
+};
+
+class WhileCommand : public Command {
+ public:
+  virtual int execute(vector<string> &str, int i);
+  virtual ~WhileCommand(){};
+};*/
+
+class PrintCommand : public Command {
+ public:
+  virtual int execute(vector<string> &str, int i);
+  virtual ~PrintCommand(){};
+};
 
 
 #endif //FLIGHTSIMULATOR__COMMAND_H_

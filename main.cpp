@@ -151,6 +151,8 @@ void parser(vector<string> &str_array) {
             cout << "parser" << endl;
             //i += thread((*c).execute, str_array, i);
             i += (*c).execute(str_array, i);
+        } else {
+          i++;
         }
     }
 }
@@ -158,8 +160,6 @@ void parser(vector<string> &str_array) {
 int main(int argc, char *argv[]) {
     Singleton *database = database->getInstance();
     lexer(argv[1], database->getVector());
-    //string arr[]={"torottle","->"};
-//  database->getCommandMap()["->"]->execute(arr);
     parser(database->getVector());
     return 0;
 }
