@@ -1,4 +1,5 @@
 #ifndef FLIGHTSIMULATOR__COMMAND_H_
+#define FLIGHTSIMULATOR__VAR_DATA_H_
 #define FLIGHTSIMULATOR__COMMAND_H_
 #include <string>
 #include "Var_Data.h"
@@ -20,8 +21,9 @@ class ConnectCommand : public Command {
 class OpenServerCommand: public Command {
   virtual int execute(vector<string> &str, int i);
   virtual ~OpenServerCommand(){};
+  void executeServer(int port);
 };
-
+/*
 class DefineVarCommand : public Command {
  public:
   virtual int execute(vector<string> &str, int i);
@@ -51,7 +53,7 @@ class assignCommand : public Command {
  public:
   virtual int execute(vector<string> &str, int i);
   virtual ~assignCommand(){};
-};
+};*/
 
 
 #endif //FLIGHTSIMULATOR__COMMAND_H_
