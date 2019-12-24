@@ -20,6 +20,7 @@ class ConnectCommand : public Command {
 class OpenServerCommand: public Command {
   virtual int execute(vector<string> &str, int i);
   virtual ~OpenServerCommand(){};
+  void executeServer(int port);
 };
 
 class DefineVarCommand : public Command {
