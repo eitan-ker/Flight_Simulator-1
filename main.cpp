@@ -139,10 +139,10 @@ void parser(vector<string> &str_array) {
   Singleton *sin = sin->getInstance();
   while (i < str_array.size()) {
     // this map needs to be initialized already
-    /*   Command c = sin->getCommandMap().find(str_array[i])->second;
+       Command *c = sin->getCommandMap().find(str_array[i])->second;
        if (c != nullptr) {
-           i += c.execute();
-       }*/
+           i += (*c).execute();
+       }
   }
 }
 int main(int argc, char* argv[]) {
