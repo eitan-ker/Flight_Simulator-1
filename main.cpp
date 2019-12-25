@@ -26,7 +26,7 @@ void check_line(string &line, vector<string> &str_array) {
     const char *token = &(line[0]);
     const char *start = token;
     const char *check_space = token;
-    int i = 0, passednumberingflag = 0, foundpattern = 0, astrophesflag = 0, enterstringtoarray = 0, counter = 0, encounterlotofspaces = 0, addquotationmarks = 0;
+    int foundpattern = 0, astrophesflag = 0, enterstringtoarray = 0, counter = 0, encounterlotofspaces = 0, skipfound_patternflag=0,check_equal_sign=0;//addquotationmarks=0;
     string c;
     regex r1("[0-9]*[.][ ]");
     if (*token == '/') {
@@ -35,22 +35,34 @@ void check_line(string &line, vector<string> &str_array) {
             return;
         }
     }
-    /*while (*token != '\0' && passednumberingflag==0) {
-      token++;
-      if (isalpha(*token) || *token == '}' ) {
-        if (!regex_match(start, token, r1)) {
-          cout << "illegal line format" << endl;
-          return;
-        }
-        passednumberingflag=1;
-      }
-    }*/
     start = token;
     while (*token != '\0' && *token != '\n') {
+      skipfound_patternflag=0;
         if (*token == '\t') {
             token++;
             start = token;
         }
+        if(check_equal_sign==1) {
+          check_equal_sign=0;
+          start=token;
+          while(*token!='\n' && *token!='{' && *token!='}' && *token != '\0' ) {
+            token++;
+          }
+          foundpattern++;
+        }
+      /*if( *token == '{') {
+        start=token;
+        token++;
+        while(*token !='}') {
+          token++;
+        }
+        string f(start,token);
+        for (int i = 0; i < c.length(); ++i) {
+          if (c[i] == '\n')
+            c[i] = ',';
+        }
+        str_array.insert(str_array.end(), f);
+      }*/
         if( *token == '\"') {
           start=token;
           token++;
@@ -58,6 +70,7 @@ void check_line(string &line, vector<string> &str_array) {
             token++;
           }
           token++;
+          skipfound_patternflag=1;
         }
         if (encounterlotofspaces == 1) {
             start = check_space;
@@ -79,7 +92,7 @@ void check_line(string &line, vector<string> &str_array) {
                 }
             }
         }
-        if ((int) *token == 34 && astrophesflag == 0) {
+       /* if ((int) *token == 34 && astrophesflag == 0) {
             astrophesflag++;
             token++;
             start = token;
@@ -96,13 +109,19 @@ void check_line(string &line, vector<string> &str_array) {
                 }
                 ptr++;
             }
+        }*/
+        if(*token=='-' || *token=='+' || *token=='*' || *token=='/') {
+          foundpattern=1;
         }
-        if (foundpattern == 1) {
+        if (foundpattern == 1 && skipfound_patternflag==0) {
             foundpattern = 0;
             enterstringtoarray = 1;
             string key_str(start, token);
             c = key_str;
             if (c.compare("////") != 0 && c.compare("") != 0) {
+              if(c == "=" || c=="<=" || c==">=") {
+                check_equal_sign=1;
+              }
                 str_array.insert(str_array.end(), c);
                 token++;
                 start = token;
@@ -129,7 +148,6 @@ void check_line(string &line, vector<string> &str_array) {
 }
 
 void lexer(const char *file_path, vector<string> &str_array) {
-    char *ptr = nullptr;
     string line;
     try {
         ifstream my_file(file_path);
@@ -146,7 +164,7 @@ void lexer(const char *file_path, vector<string> &str_array) {
 
 void parser(vector<string> &str_array) {
   //   thread tread1;
-  int i = 0;
+  unsigned int i = 0;
   Singleton *sin = sin->getInstance();
   while (i < str_array.size()) {
     // this map needs to be initialized already
@@ -163,6 +181,10 @@ void parser(vector<string> &str_array) {
 }
 
 int main(int argc, char *argv[]) {
+    int a = argc;
+    if(a==0) {
+      cout << "no parameters were given";
+    }
     Singleton *database = database->getInstance();
     lexer(argv[1], database->getVector());
     parser(database->getVector());
