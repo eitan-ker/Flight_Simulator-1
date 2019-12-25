@@ -51,6 +51,14 @@ void check_line(string &line, vector<string> &str_array) {
             token++;
             start = token;
         }
+        if( *token == '\"') {
+          start=token;
+          token++;
+          while(*token !='\"') {
+            token++;
+          }
+          token++;
+        }
         if (encounterlotofspaces == 1) {
             start = check_space;
             token = check_space;
@@ -93,10 +101,6 @@ void check_line(string &line, vector<string> &str_array) {
             foundpattern = 0;
             enterstringtoarray = 1;
             string key_str(start, token);
-            if (addquotationmarks == 1) {
-                key_str = "/"" + key_str + /";
-                addquotationmarks = 0;
-            }
             c = key_str;
             if (c.compare("////") != 0 && c.compare("") != 0) {
                 str_array.insert(str_array.end(), c);
@@ -141,20 +145,21 @@ void lexer(const char *file_path, vector<string> &str_array) {
 }
 
 void parser(vector<string> &str_array) {
- //   thread tread1;
-    int i = 0;
-    Singleton *sin = sin->getInstance();
-    while (i < str_array.size()) {
-        // this map needs to be initialized already
-        Command *c = sin->getCommandMap().find(str_array[i])->second;
-        if (c != nullptr) {
-            cout << "parser" << endl;
-            //i += thread((*c).execute, str_array, i);
-            i += (*c).execute(str_array, i);
-        } else {
-          i++;
-        }
+  //   thread tread1;
+  int i = 0;
+  Singleton *sin = sin->getInstance();
+  while (i < str_array.size()) {
+    // this map needs to be initialized already
+    Command *c = sin->getCommandMap().find(str_array.at(i))->second;
+    if (sin->getCommandMap().find(str_array.at(i)) == sin->getCommandMap().end()) {
+      i++;
+    } else {
+      cout << "parser" << endl;
+      //i += thread((*c).execute, str_array, i);
+      i += (*c).execute(str_array, i);
     }
+
+  }
 }
 
 int main(int argc, char *argv[]) {

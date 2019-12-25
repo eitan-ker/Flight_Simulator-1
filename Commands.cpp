@@ -55,17 +55,17 @@ int SimCommand::execute(vector<string> &str, int i) {
 }
 int setToClientCommand::execute(vector<string> &str, int i) {
   Singleton* t = t->getInstance();
-  Var_Data temp(0,str.at(i+4));
-  t->getsymbolTableFromServerMap().emplace(str.at(i+1),temp);
-  return i+5;
+  Var_Data temp(0,str.at(i+2));
+  t->getsymbolTableFromServerMap().emplace(str.at(i-1),temp);
+  return i+3;
 }
 int setToSimulatorCommand::execute(vector<string> &str, int i) {
   Singleton* t = t->getInstance();
-  Var_Data temp(0,str.at(i+4));
-  t->getsymbolTableToServerMap().emplace(str.at(i+1),temp);
-  float c = t->getsymbolTableToServerMap()[str.at(i+1)].get_value();
-  string temp1 = to_string(c);
-  return i+5;
+  Var_Data temp(0,str.at(i+2));
+  t->getsymbolTableToServerMap().emplace(str.at(i-1),temp);
+  /*float c = t->getsymbolTableToServerMap()[str.at(i-1)].get_value();
+  string temp1 = to_string(c);*/
+  return i+3;
 }
 int PrintCommand::execute(vector<string> &str, int i) {
   cout << str.at(i+1) << endl;
