@@ -13,6 +13,7 @@ private:
     string _sim;
 
 public:
+  Var_Data(){}
     Var_Data(double value, string sim) :
             _value(value), _sim(sim) {}
     string get_sim() {

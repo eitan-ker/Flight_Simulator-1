@@ -11,19 +11,25 @@ Singleton *Singleton::instance = 0;
 Singleton::Singleton() {
   OpenServerCommand* os = new OpenServerCommand;
   ConnectCommand* cc = new ConnectCommand;
-  //DefineVarCommand* defineVar = new DefineVarCommand;
-  //SimCommand* simCommand = new SimCommand;
-  //setToClientCommand* setToClient = new setToClientCommand;
-  //setToSimulatorCommand* settosimulatorcommand = new setToSimulatorCommand;
- // assignCommand* assigncommand = new assignCommand;
+  DefineVarCommand* defineVar = new DefineVarCommand;
+  SimCommand* simCommand = new SimCommand;
+  setToClientCommand* setToClient = new setToClientCommand;
+  setToSimulatorCommand* settosimulatorcommand = new setToSimulatorCommand;
+  assignCommand* assigncommand = new assignCommand;
+  PrintCommand* print = new PrintCommand;
+  /*WhileCommand* whilee = new WhileCommand;
+  SleepCommand* sleep = new SleepCommand;*/
   // var
   this->strToCommandMap["openDataServer"] = os;
   this->strToCommandMap["connectControlClient"] = cc;
-//  this->strToCommandMap["var"] = defineVar;
- // this->strToCommandMap["sim"] = simCommand;
-  //this->strToCommandMap["<="] = setToClient;
-  //this->strToCommandMap["=>"] = settosimulatorcommand;
-  //this->strToCommandMap["="] = assigncommand;
+  this->strToCommandMap["var"] = defineVar;
+  this->strToCommandMap["sim"] = simCommand;
+  this->strToCommandMap["<-"] = setToClient;
+  this->strToCommandMap["->"] = settosimulatorcommand;
+  this->strToCommandMap["="] = assigncommand;
+  this->strToCommandMap["Print"] = print;
+  /*this->strToCommandMap["While"] = whilee;
+  this->strToCommandMap["Sleep"] = sleep;*/
 
   // Insert var
 }
@@ -41,7 +47,7 @@ vector<string> &Singleton::getVector() {
 map<string, Command *>& Singleton::getCommandMap() {
   return this->strToCommandMap;
 }
-/*
+
 map<string,Var_Data>& Singleton:: getsymbolTableToServerMap() {
     return this->symbolTableToServer;
 }
@@ -54,6 +60,6 @@ map<string,double>& Singleton:: getgeneric_smallMap() {
 vector<string> &Singleton::getArrayOfOrdersToServer() {
   return this->orderToSendToSimulator;
 }
-*/
+
 
 
