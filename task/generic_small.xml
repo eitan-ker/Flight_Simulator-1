@@ -10,6 +10,24 @@
     <node>/instrumentation/airspeed-indicator/indicated-speed-kt</node>
 	</chunk>
 	<chunk>
+    <name>time_warp</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/sim/time/warp</node>
+	</chunk>
+	<chunk>
+    <name>switches_magnetos</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/switches/magnetos</node>
+	</chunk>
+	<chunk>
+    <name>heading-indicator_offset-deg</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/instrumentation/heading-indicator/offset-deg</node>
+	</chunk>
+	<chunk>
     <name>altimeter_indicated-altitude-ft</name>
 	<type>float</type>
 	<format>%f</format>
@@ -134,6 +152,66 @@
 	<type>float</type>
 	<format>%f</format>
     <node>/controls/engines/engine/throttle</node>
+	</chunk>
+	<chunk>
+	<name>current-engine_throttle</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/engines/current-engine/throttle</node>
+	</chunk>
+	<chunk>
+    <name>switches_master-avionics</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/switches/master-avionics</node>
+	</chunk>
+	<chunk>
+    <name>switches_starter</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/switches/starter</node>
+	</chunk>
+	<chunk>
+    <name>active-engine_auto-start</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/engines/active-engine/auto-start</node>
+	</chunk>
+	<chunk>
+    <name>flight_speedbrake</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/flight/speedbrake</node>
+	</chunk>
+	<chunk>
+    <name>c172p_brake-parking</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/sim/model/c172p/brake-parking</node>
+	</chunk>
+	<chunk>
+    <name>engine_primer</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/engines/engine/primer</node>
+	</chunk>
+	<chunk>
+    <name>current-engine_mixture</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/engines/current-engine/mixture</node>
+	</chunk>
+	<chunk>
+    <name>switches_master-bat</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/switches/master-bat</node>
+	</chunk>
+	<chunk>
+    <name>switches_master-alt</name>
+	<type>float</type>
+	<format>%f</format>
+    <node>/controls/switches/master-alt</node>
 	</chunk>
 	<chunk>
     <name>engine_rpm</name>
