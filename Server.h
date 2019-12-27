@@ -1,4 +1,4 @@
 class Server {
 public:
-    int runServer(int port);
+    void runServer(int port);
 };
