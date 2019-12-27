@@ -5,24 +5,75 @@
 #include <string>
 #include <thread>
 #include <float.h>
+#include <sys/socket.h>
+#include <string>
+#include <iostream>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <cstring>
 
 double findValueOfVarInMap(string var);
 void SleepFunc(int x);
 int OpenServerCommand::execute(vector<string> &str, int i) {
-    thread *ods = new thread(&OpenServerCommand::executeServer, this, 2);
-    ods->detach();
+    stringstream strng(str[i+1]);
+    int port = 0;
+    strng >> port;
+    //thread *ods = new thread(&OpenServerCommand::executeServer, this, port);
+    //ods->detach();
+    //executeServer(port);
+//    for (int i = 0; i < 2; i++) {
+//        cout << "thread OSD runs 2 times" << endl;
+//    }
+    //return 2;
 
-    //
-    executeServer(2);
-    for (int i = 0; i < 2; i++) {
-        cout << "thread OSD runs 2 times" << endl;
+    //create socket
+    int socketfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socketfd == -1) {
+        //error
+        std::cerr << "Could not create a socket"<<std::endl;
+        //   return -1;
     }
-    return 2;
+
+    //bind socket to IP address
+    // we first need to create the sockaddr obj.
+    sockaddr_in address; //in means IP4
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY; //give me any IP allocated for my machine
+    address.sin_port = htons(port);
+    //we need to convert our number
+    // to a number that the network understands.
+
+    //the actual bind command
+    if (bind(socketfd, (struct sockaddr *) &address, sizeof(address)) == -1) {
+        std::cerr<<"Could not bind the socket to an IP"<<std::endl;
+        // return -2;
+    }
+
+    //making socket listen to the port
+    if (listen(socketfd, 5) == -1) { //can also set to SOMAXCON (max connections)
+        std::cerr<<"Error during listening command"<<std::endl;
+        //    return -3;
+    } else{
+        std::cout<<"Server is now listening ..."<<std::endl;
+    }
+
+    // accepting a client
+    int client_socket = accept(socketfd, (struct sockaddr *) &address,
+                               (socklen_t *) &address);
+    if (client_socket == -1) {
+        std::cerr<<"Error accepting client"<<std::endl;
+        //  return -4;
+    }
+
+    thread ods(&OpenServerCommand::executeServer, this, client_socket);
+
+    ods.detach();
+//    close(socketfd); //closing the listening socket
 }
 
-void OpenServerCommand::executeServer(int port) {
+void OpenServerCommand::executeServer(int client_socket) {
     Server *server = new Server();
-    server->runServer(port);
+    server->runServer(client_socket);
 }
 
 int ConnectCommand::execute(vector<string> &str, int i) {

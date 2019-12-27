@@ -172,8 +172,6 @@ void parser(vector<string> &str_array) {
     if (sin->getCommandMap().find(str_array.at(i)) == sin->getCommandMap().end()) {
       i++;
     } else {
-      cout << "parser" << endl;
-      //i += thread((*c).execute, str_array, i);
       i += (*c).execute(str_array, i);
     }
 
