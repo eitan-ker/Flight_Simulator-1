@@ -13,23 +13,17 @@
 #include <cstring>
 #include "ex1.h"
 void SleepFunc(int x);
+
 int OpenServerCommand::execute(vector<string> &str, int i) {
-    stringstream strng(str[i+1]);
+    stringstream strng(str[i + 1]);
     int port = 0;
     strng >> port;
-    //thread *ods = new thread(&OpenServerCommand::executeServer, this, port);
-    //ods->detach();
-    //executeServer(port);
-//    for (int i = 0; i < 2; i++) {
-//        cout << "thread OSD runs 2 times" << endl;
-//    }
-    //return 2;
 
     //create socket
     int socketfd = socket(AF_INET, SOCK_STREAM, 0);
     if (socketfd == -1) {
         //error
-        std::cerr << "Could not create a socket"<<std::endl;
+        std::cerr << "Could not create a socket" << std::endl;
         //   return -1;
     }
 
@@ -44,31 +38,31 @@ int OpenServerCommand::execute(vector<string> &str, int i) {
 
     //the actual bind command
     if (bind(socketfd, (struct sockaddr *) &address, sizeof(address)) == -1) {
-        std::cerr<<"Could not bind the socket to an IP"<<std::endl;
+        std::cerr << "Could not bind the socket to an IP" << std::endl;
         // return -2;
     }
 
     //making socket listen to the port
     if (listen(socketfd, 5) == -1) { //can also set to SOMAXCON (max connections)
-        std::cerr<<"Error during listening command"<<std::endl;
+        std::cerr << "Error during listening command" << std::endl;
         //    return -3;
-    } else{
-        std::cout<<"Server is now listening ..."<<std::endl;
+    } else {
+        std::cout << "Server is now listening ..." << std::endl;
     }
 
     // accepting a client
     int client_socket = accept(socketfd, (struct sockaddr *) &address,
                                (socklen_t *) &address);
     if (client_socket == -1) {
-        std::cerr<<"Error accepting client"<<std::endl;
+        std::cerr << "Error accepting client" << std::endl;
         //  return -4;
     }
-
+    // will open thread to run infinite loop of recieving data from game
     thread ods(&OpenServerCommand::executeServer, this, client_socket);
-
     ods.detach();
 //    close(socketfd); //closing the listening socket
 }
+
 
 void OpenServerCommand::executeServer(int client_socket) {
     Server *server = new Server();

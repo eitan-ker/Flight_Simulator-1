@@ -1,13 +1,17 @@
-//
-// Created by meni on 25/12/2019.
-//
 
 #ifndef FLIGHTSIMULATOR__SERVER_H_
 #define FLIGHTSIMULATOR__SERVER_H_
 
+#include <sys/socket.h>
+#include <string>
+#include <iostream>
+#include <unistd.h>
+#include <netinet/in.h>
+#include "Singleton.h"
+
 class Server {
  public:
-  int runServer(int port);
+  void runServer(int client_socket);
 };
 
 #endif //FLIGHTSIMULATOR__SERVER_H_

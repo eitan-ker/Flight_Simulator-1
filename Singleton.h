@@ -34,14 +34,14 @@ class Singleton {
   map<string,Var_Data>& getsymbolTableFromServerMap();
   map<string,Command*>& getCommandMap();
   map<string,float>& getgeneric_smallMap();
+  Singleton set_generic_smallMap(string buf_to_value, int sim_index);
   vector<string>& getArrayOfOrdersToServer();
-  Var_Data* getVar_Data(string& str);
-  ~Singleton(){
+  ~Singleton(){/*
     map<string,Command*>:: iterator it=strToCommandMap.begin();
     for(;it!=strToCommandMap.end(); ++it) {
       delete it->second;
       it->second= nullptr;
-    }
+    }*/
   }
 };
 
