@@ -80,7 +80,7 @@ Var_Data* Singleton::getVar_Data(string& str) {
   }
 }
 
-Singleton Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
+void Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     string::size_type sz;
     float value = stof(buf_to_value, &sz);
     if (sim_index == 1) {
@@ -191,5 +191,14 @@ Singleton Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     if (sim_index == 36) {
         this->generic_smallMap["/engines/engine/rpm"] = value;
     }
+}
+map<string,ValueAndNameObject>& Singleton::getAllVarsFromXMLMMap() {
+  return this->AllVarsFromXML;
+}
+void Singleton::InitializationofAllVarsFromXML() {
+  map<string, float>::iterator it;
 
+  for (const auto& [key, value]: generic_smallMap) {
+    AllVarsFromXML[key].set_value(value);
+  }
 }
