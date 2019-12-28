@@ -4,8 +4,15 @@
 #include "Var_Data.h"
 #include <vector>
 
+enum WHiCHMAP { ISNTINMAPS, ISINFROMSERVERMAP, ISINTOSERVERMAP };
 using namespace std;
-
+float findValueOfVarInMap(string var);
+float getFloatValuefromString(const vector<string> &str, int i);
+void buildVectorFromString(vector<string>& vec, string& str);
+void SleepFunc(int x);
+float calculateMathExpression(string str);
+void gothroughloop(int startofloop, int endofloop);
+int WhichMapToPutVariable(string& str);
 class Command {
  public:
   virtual int execute(vector<string> &str, int i) = 0;
@@ -69,6 +76,11 @@ class PrintCommand : public Command {
  public:
   virtual int execute(vector<string> &str, int i);
   virtual ~PrintCommand(){};
+};
+class IfCommand : public Command {
+ public:
+  virtual int execute(vector<string> &str, int i);
+  virtual ~IfCommand(){};
 };
 
 
