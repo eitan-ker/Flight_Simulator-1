@@ -19,6 +19,7 @@ Singleton::Singleton() {
   PrintCommand* print = new PrintCommand;
   WhileCommand* whilee = new WhileCommand;
   SleepCommand* sleep = new SleepCommand;
+  IfCommand* ifcommand = new IfCommand;
   // var
   this->strToCommandMap["openDataServer"] = os;
   this->strToCommandMap["connectControlClient"] = cc;
@@ -28,8 +29,13 @@ Singleton::Singleton() {
   this->strToCommandMap["->"] = settosimulatorcommand;
   this->strToCommandMap["="] = assigncommand;
   this->strToCommandMap["Print"] = print;
+  this->strToCommandMap["print"] = print;
   this->strToCommandMap["While"] = whilee;
+  this->strToCommandMap["while"] = whilee;
   this->strToCommandMap["Sleep"] = sleep;
+  this->strToCommandMap["sleep"] = sleep;
+  this->strToCommandMap["if"] = ifcommand;
+  this->strToCommandMap["If"] = ifcommand;
 
   // Insert var
 }
