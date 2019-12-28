@@ -11,6 +11,7 @@
 #include <regex>
 #include <sstream>
 #include "Singleton.h"
+#include "Command.h"
 
 using namespace std;
 
@@ -25,8 +26,7 @@ int main(int argc, char *argv[]);
 void check_line(string &line, vector<string> &str_array) {
     const char *token = &(line[0]);
     const char *start = token;
-    const char *check_space = token;
-    int foundpattern = 0, astrophesflag = 0, enterstringtoarray = 0, counter = 0, encounterlotofspaces = 0, skipfound_patternflag=0,check_equal_sign=0;//addquotationmarks=0;
+    int foundpattern = 0, enterstringtoarray = 0, counter = 0, skipfound_patternflag=0,check_equal_sign=0;
     string c;
     regex r1("[0-9]*[.][ ]");
     if (*token == '/') {
@@ -36,7 +36,7 @@ void check_line(string &line, vector<string> &str_array) {
         }
     }
     start = token;
-    while (*token != '\0' && *token != '\n') {
+    while (*token != '\0' && *token != '\n' && *token != '\r') {
       skipfound_patternflag=0;
         if (*token == '\t') {
             token++;
@@ -69,49 +69,10 @@ void check_line(string &line, vector<string> &str_array) {
           while(*token !='\"') {
             token++;
           }
-          token++;
           skipfound_patternflag=1;
         }
-        if (encounterlotofspaces == 1) {
-            start = check_space;
-            token = check_space;
-            counter = 0;
-        }
-        if (*token == ' ' || *token == '(' || *token == ')' || *token == ',') {
+        if (*token == ' '  || *token == '(' || *token == ')' || *token == ',') {
             foundpattern = 1;
-            if (*token == ' ') {
-                check_space = token;
-                check_space++;
-                while (*check_space == ' ') {
-                    check_space++;
-                    counter++;
-                }
-                if (counter > 0) {
-                    foundpattern = 0;
-                    encounterlotofspaces = 1;
-                }
-            }
-        }
-       /* if ((int) *token == 34 && astrophesflag == 0) {
-            astrophesflag++;
-            token++;
-            start = token;
-        }
-        if ((int) *token == 34 && astrophesflag == 1) {
-            astrophesflag++;
-        }
-        if (astrophesflag == 2) {
-            foundpattern = 1;
-            const char *ptr = start;
-            while (ptr != token) {
-                if (*ptr == '+' || *ptr == '-' || *ptr == '*' || *ptr == '/') {
-                    addquotationmarks = 1;
-                }
-                ptr++;
-            }
-        }*/
-        if(*token=='-' || *token=='+' || *token=='*' || *token=='/') {
-          foundpattern=1;
         }
         if (foundpattern == 1 && skipfound_patternflag==0) {
             foundpattern = 0;
@@ -123,15 +84,24 @@ void check_line(string &line, vector<string> &str_array) {
                 check_equal_sign=1;
               }
                 str_array.insert(str_array.end(), c);
+              if(*token!='\0' && *token!='{' && *token!='}') {
                 token++;
+              }
+              if(*token=='{') {
+                c = "{";
+                str_array.insert(str_array.end(), c);
+                token++;
+                start=token;
+              }
+              if(*token=='}') {
+                c = "}";
+                str_array.insert(str_array.end(), c);
+                token++;
+                start=token;
+              }
                 start = token;
             } else {
                 return; //encounter comment
-            }
-            if (astrophesflag == 2) {
-                token++;
-                start = token;
-                foundpattern = 0;
             }
         }
         if (enterstringtoarray == 0) {
@@ -150,10 +120,11 @@ void check_line(string &line, vector<string> &str_array) {
 void lexer(const char *file_path, vector<string> &str_array) {
     string line;
     try {
-        ifstream my_file(file_path);
+        ifstream my_file(file_path,ios::in);
         if (my_file.is_open()) {
             while (getline(my_file, line)) {
                 check_line(line, str_array);
+                line="";
             }
             my_file.close();
         }
@@ -186,5 +157,7 @@ int main(int argc, char *argv[]) {
     Singleton *database = database->getInstance();
     lexer(argv[1], database->getVector());
     parser(database->getVector());
+    a=0;
+  //val = calculateMathExpression("-1.000*80");
     return 0;
 }

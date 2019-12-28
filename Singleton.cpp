@@ -19,6 +19,7 @@ Singleton::Singleton() {
   PrintCommand* print = new PrintCommand;
   WhileCommand* whilee = new WhileCommand;
   SleepCommand* sleep = new SleepCommand;
+  IfCommand* ifcommand = new IfCommand;
   // var
   this->strToCommandMap["openDataServer"] = os;
   this->strToCommandMap["connectControlClient"] = cc;
@@ -28,8 +29,13 @@ Singleton::Singleton() {
   this->strToCommandMap["->"] = settosimulatorcommand;
   this->strToCommandMap["="] = assigncommand;
   this->strToCommandMap["Print"] = print;
+  this->strToCommandMap["print"] = print;
   this->strToCommandMap["While"] = whilee;
+  this->strToCommandMap["while"] = whilee;
   this->strToCommandMap["Sleep"] = sleep;
+  this->strToCommandMap["sleep"] = sleep;
+  this->strToCommandMap["if"] = ifcommand;
+  this->strToCommandMap["If"] = ifcommand;
 
   // Insert var
 }
@@ -54,11 +60,22 @@ map<string,Var_Data>& Singleton:: getsymbolTableToServerMap() {
 map<string,Var_Data>& Singleton:: getsymbolTableFromServerMap() {
   return this->symbolTableFromServer;
 }
-map<string,double>& Singleton:: getgeneric_smallMap() {
+map<string,float>& Singleton:: getgeneric_smallMap() {
   return this->generic_smallMap;
 }
 vector<string> &Singleton::getArrayOfOrdersToServer() {
   return this->orderToSendToSimulator;
+}
+Var_Data* Singleton::getVar_Data(string& str) {
+  if (getsymbolTableToServerMap().find(str) == getsymbolTableToServerMap().end()) {
+    if (getsymbolTableFromServerMap().find(str) == getsymbolTableToServerMap().end()) {
+      return nullptr;
+    } else {
+      return &getsymbolTableFromServerMap()[str];
+    }
+  } else {
+    return &getsymbolTableToServerMap()[str];
+  }
 }
 
 
