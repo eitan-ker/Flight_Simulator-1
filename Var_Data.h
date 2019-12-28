@@ -9,23 +9,27 @@ using namespace std;
 class Var_Data {
 
 private:
-    double _value;
+    float _value;
     string _sim;
 
 public:
-  Var_Data(){}
-    Var_Data(double value, string sim) :
-            _value(value), _sim(sim) {}
-    string get_sim() {
+  Var_Data(){};
+    Var_Data(float value, string sim) :
+            _value(value), _sim(sim) {};
+  Var_Data(const Var_Data& deepcopy) {
+    this->set_value(deepcopy.get_value());
+    this->set_sim(deepcopy.get_sim());
+  }
+    string get_sim() const {
         return this->_sim;
     }
     void set_sim(string sim) {
         this->_sim = sim;
     }
-    double get_value() {
+    float get_value() const {
         return this->_value;
     }
-    void set_value(double value) {
+    void set_value(float value) {
         this->_value = value;
     }
 

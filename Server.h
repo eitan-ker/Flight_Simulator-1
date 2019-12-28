@@ -1,3 +1,7 @@
+
+#ifndef FLIGHTSIMULATOR__SERVER_H_
+#define FLIGHTSIMULATOR__SERVER_H_
+
 #include <sys/socket.h>
 #include <string>
 #include <iostream>
@@ -5,10 +9,9 @@
 #include <netinet/in.h>
 #include "Singleton.h"
 
-
-using namespace std;
-
 class Server {
-public:
-    void runServer(int port);
+ public:
+  void runServer(int client_socket);
 };
+
+#endif //FLIGHTSIMULATOR__SERVER_H_

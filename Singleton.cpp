@@ -61,6 +61,19 @@ vector<string> &Singleton::getArrayOfOrdersToServer() {
   return this->orderToSendToSimulator;
 }
 
+
+Var_Data* Singleton::getVar_Data(string& str) {
+  if (getsymbolTableToServerMap().find(str) == getsymbolTableToServerMap().end()) {
+    if (getsymbolTableFromServerMap().find(str) == getsymbolTableToServerMap().end()) {
+      return nullptr;
+    } else {
+      return &getsymbolTableFromServerMap()[str];
+    }
+  } else {
+    return &getsymbolTableToServerMap()[str];
+  }
+}
+
 Singleton Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     string::size_type sz;
     float value = stof(buf_to_value, &sz);
@@ -174,6 +187,3 @@ Singleton Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     }
 
 }
-
-
-
