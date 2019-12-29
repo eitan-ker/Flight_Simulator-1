@@ -72,7 +72,7 @@ class Singleton {
   map<string,Var_Data>& getsymbolTableFromServerMap();
   map<string,Command*>& getCommandMap();
   map<string,float>& getgeneric_smallMap();
-  Var_Data* getVar_Data(string& str);
+  Var_Data& getVar_Data(string& str);
   void InitializationofAllVarsFromXML();
   map<string,ValueAndNameObject>& getAllVarsFromXMLMMap();
   void set_generic_smallMap(string buf_to_value, int sim_index);
@@ -83,8 +83,6 @@ class Singleton {
       delete it->second;
       it->second= nullptr;
     }
-    for (map<string, Command*>::iterator it = strToCommandMap.begin(); it != strToCommandMap.end(); ++it)
-      delete it->second;
   }
 };
 

@@ -68,15 +68,15 @@ vector<string> &Singleton::getArrayOfOrdersToServer() {
 }
 
 
-Var_Data* Singleton::getVar_Data(string& str) {
+Var_Data& Singleton::getVar_Data(string& str) {
   if (getsymbolTableToServerMap().find(str) == getsymbolTableToServerMap().end()) {
     if (getsymbolTableFromServerMap().find(str) == getsymbolTableToServerMap().end()) {
-      return nullptr;
+      throw "variable doesnt exist in Maps";
     } else {
-      return &getsymbolTableFromServerMap()[str];
+      return getsymbolTableFromServerMap()[str];
     }
   } else {
-    return &getsymbolTableToServerMap()[str];
+    return getsymbolTableToServerMap()[str];
   }
 }
 
