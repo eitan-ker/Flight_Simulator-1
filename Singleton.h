@@ -22,8 +22,8 @@ class Singleton {
  private:
   vector<string> str_array;
   map<string,Command*> strToCommandMap;//this is the map of string-command relation
-  map<string,Var_Data> symbolTableToServer;//this the map to store data that we want to send to server
-  map<string,Var_Data> symbolTableFromServer; //this is the map to store data we got from server
+  map<string,Var_Data*> symbolTableToServer;//this the map to store data that we want to send to server
+  map<string,Var_Data*> symbolTableFromServer; //this is the map to store data we got from server
   map<string,float> generic_smallMap = {}; //this is the temporary map to store string and float from ‫‪generic_small.xml‬‬
   map<string,ValueAndNameObject> AllVarsFromXML = { {"/instrumentation/airspeed-indicator/indicated-speed-kt",{0,"/instrumentation/airspeed-indicator/indicated-speed-kt"}},
       {"/sim/time/warp",{0,"/sim/time/warp"}},
@@ -68,11 +68,11 @@ class Singleton {
  public:
   static Singleton *getInstance();
   vector<string>& getVector();
-  map<string,Var_Data>& getsymbolTableToServerMap();
-  map<string,Var_Data>& getsymbolTableFromServerMap();
+  map<string,Var_Data*>& getsymbolTableToServerMap();
+  map<string,Var_Data*>& getsymbolTableFromServerMap();
   map<string,Command*>& getCommandMap();
   map<string,float>& getgeneric_smallMap();
-  Var_Data& getVar_Data(string& str);
+  Var_Data* getVar_Data(string& str);
   void InitializationofAllVarsFromXML();
   map<string,ValueAndNameObject>& getAllVarsFromXMLMMap();
   void set_generic_smallMap(string buf_to_value, int sim_index);
@@ -82,6 +82,16 @@ class Singleton {
     for(;it!=strToCommandMap.end(); ++it) {
       delete it->second;
       it->second= nullptr;
+    }
+    map<string,Var_Data*>:: iterator it2=symbolTableFromServer.begin();
+    for(;it2!=symbolTableFromServer.end(); ++it2) {
+      delete it2->second;
+      it2->second= nullptr;
+    }
+    map<string,Var_Data*>:: iterator it3=symbolTableToServer.begin();
+    for(;it3!=symbolTableToServer.end(); ++it3) {
+      delete it3->second;
+      it3->second= nullptr;
     }
   }
 };

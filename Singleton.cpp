@@ -54,10 +54,10 @@ map<string, Command *>& Singleton::getCommandMap() {
   return this->strToCommandMap;
 }
 
-map<string,Var_Data>& Singleton:: getsymbolTableToServerMap() {
+map<string,Var_Data*>& Singleton:: getsymbolTableToServerMap() {
     return this->symbolTableToServer;
 }
-map<string,Var_Data>& Singleton:: getsymbolTableFromServerMap() {
+map<string,Var_Data*>& Singleton:: getsymbolTableFromServerMap() {
   return this->symbolTableFromServer;
 }
 map<string,float>& Singleton:: getgeneric_smallMap() {
@@ -68,15 +68,17 @@ vector<string> &Singleton::getArrayOfOrdersToServer() {
 }
 
 
-Var_Data& Singleton::getVar_Data(string& str) {
+Var_Data* Singleton::getVar_Data(string& str) {
   if (getsymbolTableToServerMap().find(str) == getsymbolTableToServerMap().end()) {
     if (getsymbolTableFromServerMap().find(str) == getsymbolTableToServerMap().end()) {
       throw "variable doesnt exist in Maps";
     } else {
-      return getsymbolTableFromServerMap()[str];
     }
+    Var_Data* temp = getsymbolTableFromServerMap()[str];
+    return temp;
   } else {
-    return getsymbolTableToServerMap()[str];
+    Var_Data* temp = getsymbolTableToServerMap()[str];
+    return temp;
   }
 }
 
@@ -200,5 +202,14 @@ void Singleton::InitializationofAllVarsFromXML() {
 
   for (const auto& [key, value]: generic_smallMap) {
     AllVarsFromXML[key].set_value(value);
+    if (getsymbolTableToServerMap().find(AllVarsFromXML[key].get_name()) == getsymbolTableToServerMap().end()) {
+      if ( getsymbolTableFromServerMap().find(AllVarsFromXML[key].get_name()) == getsymbolTableToServerMap().end()) {
+
+      } else {
+        getsymbolTableFromServerMap()[AllVarsFromXML[key].get_name()]->set_value(value);
+      }
+    } else {
+      getsymbolTableToServerMap()[AllVarsFromXML[key].get_name()]->set_value(value);
+    }
   }
 }
