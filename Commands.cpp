@@ -80,15 +80,24 @@ int DefineVarCommand::execute(vector<string> &str, int i) {
   Singleton* t = t->getInstance();
   string c = str.at(i+2);
   string d = str.at(i+3);
+  string var = str.at(i+1);
   if(c=="=") {
-    j = t->getCommandMap()[c]->execute(str, i+2);
-    j+=2;
+    Var_Data* temp = t->getVar_Data(d);
+    if (t->getsymbolTableToServerMap().find(d) == t->getsymbolTableToServerMap().end()) {
+      if (t->getsymbolTableFromServerMap().find(d) == t->getsymbolTableToServerMap().end()) {
+      } else {
+        t->getsymbolTableFromServerMap().emplace(var, temp);
+      }
+    } else {
+      t->getsymbolTableToServerMap().emplace(var,temp);
+    }
+    j+=1;
   } else if(c=="->" || c=="<-" ) {
     j = t->getCommandMap()[d]->execute(str, i+2);
     j+=2;
   }
   return j;
-  }
+}
 
 int SimCommand::execute(vector<string> &str, int i) {
   int j = 0;
@@ -113,14 +122,16 @@ int SimCommand::execute(vector<string> &str, int i) {
 int setToClientCommand::execute(vector<string> &str, int i) {
   Singleton* t = t->getInstance();
   string simpath = str.at(i+2).substr(1,str.at(i+2).size()-2);
-  Var_Data temp(0,simpath);
+  Var_Data* temp = new Var_Data(t->getAllVarsFromXMLMMap()[simpath].get_value(),simpath);
+  t->getAllVarsFromXMLMMap()[simpath].set_name(str.at(i-1));
   t->getsymbolTableFromServerMap().emplace(str.at(i-1),temp);
   return 3;
 }
 int setToSimulatorCommand::execute(vector<string> &str, int i) {
   Singleton* t = t->getInstance();
   string simpath = str.at(i+2).substr(1,str.at(i+2).size()-2);
-  Var_Data temp(0,simpath);
+  Var_Data* temp = new Var_Data{t->getAllVarsFromXMLMMap()[simpath].get_value(),simpath};
+  t->getAllVarsFromXMLMMap()[simpath].set_name(str.at(i-1));
   t->getsymbolTableToServerMap().emplace(str.at(i-1),temp);
   return 3;
 }
@@ -131,10 +142,10 @@ float findValueOfVarInMap(string var) {
     if (t->getsymbolTableFromServerMap().find(var) == t->getsymbolTableToServerMap().end()) {
       throw "error: variable not found";
     } else {
-      j = t->getsymbolTableFromServerMap()[var].get_value();
+      j = t->getsymbolTableFromServerMap()[var]->get_value();
     }
   } else {
-    j = t->getsymbolTableToServerMap()[var].get_value();
+    j = t->getsymbolTableToServerMap()[var]->get_value();
   }
   return j;
 }
@@ -177,19 +188,23 @@ int assignCommand::execute(vector<string> &str, int i) {
         notavariable = 0;
       }
       if(notavariable==0) {
-        ptr = t->getVar_Data(str.at(i + 1));
-        Var_Data temp(*ptr);
-        t->getsymbolTableFromServerMap().emplace(var, temp);
+        t->getsymbolTableFromServerMap().emplace(var, (t->getVar_Data(str.at(i + 1))));
       }
     }
       break;
-    case ISINFROMSERVERMAP:
-      t->getsymbolTableFromServerMap()[var].set_value(d);
+    case ISINFROMSERVERMAP: {
+      t->getsymbolTableFromServerMap()[var]->set_value(d);
+      str_val = t->getsymbolTableFromServerMap()[var]->get_sim();
+      t->getAllVarsFromXMLMMap()[str_val].set_value(d);
+    }
       break;
-    case ISINTOSERVERMAP:
+    case ISINTOSERVERMAP: {
       t->getArrayOfOrdersToServer().emplace(t->getArrayOfOrdersToServer().end(), "set " +
-      t->getsymbolTableToServerMap()[str.at(i-1)].get_sim().substr(1,t->getsymbolTableToServerMap()[str.at(i-1)].get_sim().size()-1)+" "+ str_val + "\r\n");
-      t->getsymbolTableToServerMap()[str.at(i-1)].set_value(d);
+          t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim().substr(1,t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim().size() - 1) + " "+ str_val + "\r\n");
+      t->getsymbolTableToServerMap()[str.at(i - 1)]->set_value(d);
+      string sim_path = t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim();
+      t->getAllVarsFromXMLMMap()[sim_path].set_value(d);
+    }
       break;
     default:
       break;
@@ -352,7 +367,7 @@ float getFloatValuefromString(const vector<string> &str, int i) { //get value fr
 float calculateMathExpression(string str) {//calculate complex math expression in string format
   Interpreter* i2;
   string final_expression="";
-  regex r2("^[-+]?[0-9]*\.?[0-9]+$");
+  regex r2("^[-+]?[0-9]*\\.?[0-9]+$");
   const char* token=&final_expression[0];
   const char *start = token;
   float result=0,d=0;
@@ -444,3 +459,4 @@ int WhichMapToPutVariable(string& str) {
     return 2;
   }
 }
+

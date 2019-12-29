@@ -54,10 +54,10 @@ map<string, Command *>& Singleton::getCommandMap() {
   return this->strToCommandMap;
 }
 
-map<string,Var_Data>& Singleton:: getsymbolTableToServerMap() {
+map<string,Var_Data*>& Singleton:: getsymbolTableToServerMap() {
     return this->symbolTableToServer;
 }
-map<string,Var_Data>& Singleton:: getsymbolTableFromServerMap() {
+map<string,Var_Data*>& Singleton:: getsymbolTableFromServerMap() {
   return this->symbolTableFromServer;
 }
 map<string,float>& Singleton:: getgeneric_smallMap() {
@@ -71,16 +71,18 @@ vector<string> &Singleton::getArrayOfOrdersToServer() {
 Var_Data* Singleton::getVar_Data(string& str) {
   if (getsymbolTableToServerMap().find(str) == getsymbolTableToServerMap().end()) {
     if (getsymbolTableFromServerMap().find(str) == getsymbolTableToServerMap().end()) {
-      return nullptr;
+      throw "variable doesnt exist in Maps";
     } else {
-      return &getsymbolTableFromServerMap()[str];
     }
+    Var_Data* temp = getsymbolTableFromServerMap()[str];
+    return temp;
   } else {
-    return &getsymbolTableToServerMap()[str];
+    Var_Data* temp = getsymbolTableToServerMap()[str];
+    return temp;
   }
 }
 
-Singleton Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
+void Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     string::size_type sz;
     float value = stof(buf_to_value, &sz);
     if (sim_index == 1) {
@@ -191,5 +193,23 @@ Singleton Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     if (sim_index == 36) {
         this->generic_smallMap["/engines/engine/rpm"] = value;
     }
+}
+map<string,ValueAndNameObject>& Singleton::getAllVarsFromXMLMMap() {
+  return this->AllVarsFromXML;
+}
+void Singleton::InitializationofAllVarsFromXML() {
+  map<string, float>::iterator it;
 
+  for (const auto& [key, value]: generic_smallMap) {
+    AllVarsFromXML[key].set_value(value);
+    if (getsymbolTableToServerMap().find(AllVarsFromXML[key].get_name()) == getsymbolTableToServerMap().end()) {
+      if ( getsymbolTableFromServerMap().find(AllVarsFromXML[key].get_name()) == getsymbolTableToServerMap().end()) {
+
+      } else {
+        getsymbolTableFromServerMap()[AllVarsFromXML[key].get_name()]->set_value(value);
+      }
+    } else {
+      getsymbolTableToServerMap()[AllVarsFromXML[key].get_name()]->set_value(value);
+    }
+  }
 }
