@@ -15,12 +15,14 @@
 #include <list>
 #include <utility>
 #include <fstream>
+#include <mutex>
 #include <regex>
 #include <sstream>
 using namespace std;
 class Singleton {
  private:
   vector<string> str_array;
+  mutex Mutex;
   map<string,Command*> strToCommandMap;//this is the map of string-command relation
   map<string,Var_Data*> symbolTableToServer;//this the map to store data that we want to send to server
   map<string,Var_Data*> symbolTableFromServer; //this is the map to store data we got from server
@@ -66,6 +68,8 @@ class Singleton {
   static Singleton* instance;
   Singleton(); // will be called only when calling getInstance
  public:
+  void setMutexLocked();
+  void setMutexUnlocked();
   static Singleton *getInstance();
   vector<string>& getVector();
   map<string,Var_Data*>& getsymbolTableToServerMap();

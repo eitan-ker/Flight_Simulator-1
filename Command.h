@@ -9,7 +9,6 @@ using namespace std;
 float findValueOfVarInMap(string var);
 float getFloatValuefromString(const vector<string> &str, int i);
 void buildVectorFromString(vector<string>& vec, string& str);
-void SleepFunc(int x);
 float calculateMathExpression(string str);
 void gothroughloop(int startofloop, int endofloop);
 int WhichMapToPutVariable(string& str);
@@ -22,6 +21,7 @@ class Command {
 class ConnectCommand : public Command {
   virtual int execute(vector<string> &str, int i);
   virtual ~ConnectCommand(){};
+  void executeConnect(int port);
 };
 
 class OpenServerCommand: public Command {
@@ -29,6 +29,7 @@ class OpenServerCommand: public Command {
   virtual ~OpenServerCommand(){};
   void executeServer(int port);
 };
+
 
 class DefineVarCommand : public Command {
  public:

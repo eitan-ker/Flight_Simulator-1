@@ -11,10 +11,17 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <cstring>
+#include <arpa/inet.h>
 #include "ex1.h"
+#include "Client.h"
+
 void SleepFunc(int x);
 
 int OpenServerCommand::execute(vector<string> &str, int i) {
+
+    // if there is a problem with the connection what do we return?
+    // if we connect and run the infinit loop how will it return 2 for the next command?
+
     stringstream strng(str[i + 1]);
     int port = 0;
     strng >> port;
@@ -57,9 +64,14 @@ int OpenServerCommand::execute(vector<string> &str, int i) {
         std::cerr << "Error accepting client" << std::endl;
         //  return -4;
     }
+
+    // how will i return 2 to parser for the next command if there is a thread running?
+    // works as expected - runs the thread separately and it;s ok. will it always works
+
     // will open thread to run infinite loop of recieving data from game
     thread ods(&OpenServerCommand::executeServer, this, client_socket);
     ods.detach();
+    return 2;
 //    close(socketfd); //closing the listening socket
 }
 
@@ -70,11 +82,50 @@ void OpenServerCommand::executeServer(int client_socket) {
 }
 
 int ConnectCommand::execute(vector<string> &str, int i) {
-    for (int i = 0; i < 3; i++) {
-        cout << "thread OSD runs 3 times" << endl;
+    string ip_to_connect = str[i + 1];
+    const char *token = &(ip_to_connect[0]);
+    stringstream strng(str[i + 2]);
+    int port = 0;
+    strng >> port;
+
+    //create socket
+    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket == -1) {
+        //error
+        std::cerr << "Could not create a socket"<<std::endl;
+        //return -1;
     }
+
+    //We need to create a sockaddr obj to hold address of server
+    sockaddr_in address; //in means IP4
+    address.sin_family = AF_INET;//IP4
+    address.sin_addr.s_addr = inet_addr("127.0.0.1");  //the localhost address
+    address.sin_port = htons(port);
+    //we need to convert our number (both port & localhost)
+    // to a number that the network understands.
+
+    // Requesting a connection with the server on local host with port 8081
+    int is_connect = connect(client_socket, (struct sockaddr *)&address, sizeof(address));
+    if (is_connect == -1) {
+        std::cerr << "Could not connect to host server"<<std::endl;
+      //  return -2;
+    } else {
+        std::cout<<"Client is now connected to server" <<std::endl;
+    }
+
+    // thread maker
+    thread cc(&ConnectCommand::executeConnect, this, client_socket);
+    cc.detach();
+
+
     return 3;
 }
+
+void ConnectCommand::executeConnect(int client_socket) {
+    Client *client = new Client();
+    client->runClient(client_socket);
+}
+
 int DefineVarCommand::execute(vector<string> &str, int i) {
   int j = 0;
   Singleton* t = t->getInstance();
@@ -102,6 +153,7 @@ int DefineVarCommand::execute(vector<string> &str, int i) {
 int SimCommand::execute(vector<string> &str, int i) {
   int j = 0;
   Singleton* t = t->getInstance();
+  t->setMutexLocked();
   string temp = str.at(i+2);
   const char* start = &(temp[0]);
   const char* end = &(temp[temp.size()-1]);
@@ -117,6 +169,7 @@ int SimCommand::execute(vector<string> &str, int i) {
   } else if(binding=="<-") {
     j = t->getCommandMap()[binding]->execute(str,i);
   }
+  t->setMutexUnlocked();
   return j;
 }
 int setToClientCommand::execute(vector<string> &str, int i) {
@@ -171,6 +224,7 @@ int assignCommand::execute(vector<string> &str, int i) {
   Var_Data *ptr = nullptr;
   int whichMap=0;
   Singleton* t = t->getInstance();
+  t->setMutexUnlocked();
   float d = calculateMathExpression(str.at(i+1));
     str_val = to_string(d);
     whichMap=WhichMapToPutVariable(str.at(i-1));
@@ -209,14 +263,14 @@ int assignCommand::execute(vector<string> &str, int i) {
     default:
       break;
   }
+  t->setMutexUnlocked();
   return 2;
 }
 int SleepCommand::execute(vector<string> &str, int i) {
   int sleeptime=0;
   try {
     sleeptime = stoi(str.at(i + 1));
-    std::thread thread1(SleepFunc,sleeptime);
-    thread1.join();
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleeptime));
   }
   catch(...) {
     throw "there was a problem with given integer to Sleep command";
@@ -331,11 +385,6 @@ int IfCommand::execute(vector<string> &str, int i) {
   }
 
   return (j+count+1)-i;
-}
-void SleepFunc(int g) {
-  Singleton* t = t->getInstance();
-  //cout << "encounter sleep command in Fly.txt. sleep for "  << x << " milliseconds" << endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(g));
 }
 void gothroughloop(int startofloop, int endofloop) { //help to run commands in curky brackets in if\while statement
   Singleton *sin = sin->getInstance();
