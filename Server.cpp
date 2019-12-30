@@ -18,8 +18,10 @@ void Server::runServer(int client_socket) {
             if ((bufferString[i] == ',') || (buffer[i] == '\n')) {
                 sim_index++;
                 database->set_generic_smallMap(value_buf, sim_index);
+                cout << value_buf << ", ";
                 value_buf = "";
                 if (buffer[i] == '\n') {
+                    cout << endl;
                     sim_index = 0;
                 }
                 continue;
@@ -31,6 +33,6 @@ void Server::runServer(int client_socket) {
             // concatenate value
             value_buf = value_buf + bufferString[i];
         }
-
+        //cout << buffer << "-----server"<< endl;
     }
 }
