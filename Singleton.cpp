@@ -50,7 +50,7 @@ vector<string> &Singleton::getVector() {
   return this->str_array;
 }
 
-map<string, Command *>& Singleton::getCommandMap() {
+map<string, Command*>& Singleton::getCommandMap() {
   return this->strToCommandMap;
 }
 
@@ -73,9 +73,9 @@ Var_Data* Singleton::getVar_Data(string& str) {
     if (getsymbolTableFromServerMap().find(str) == getsymbolTableToServerMap().end()) {
       throw "variable doesnt exist in Maps";
     } else {
+      Var_Data* temp = getsymbolTableFromServerMap()[str];
+      return temp;
     }
-    Var_Data* temp = getsymbolTableFromServerMap()[str];
-    return temp;
   } else {
     Var_Data* temp = getsymbolTableToServerMap()[str];
     return temp;
@@ -199,17 +199,24 @@ map<string,ValueAndNameObject>& Singleton::getAllVarsFromXMLMMap() {
 }
 void Singleton::InitializationofAllVarsFromXML() {
   map<string, float>::iterator it;
-
-  for (const auto& [key, value]: generic_smallMap) {
-    AllVarsFromXML[key].set_value(value);
-    if (getsymbolTableToServerMap().find(AllVarsFromXML[key].get_name()) == getsymbolTableToServerMap().end()) {
-      if ( getsymbolTableFromServerMap().find(AllVarsFromXML[key].get_name()) == getsymbolTableToServerMap().end()) {
+  setMutexLocked();
+  for (const auto& kv : generic_smallMap) {
+    AllVarsFromXML[kv.first].set_value(kv.second);
+    if (getsymbolTableToServerMap().find(AllVarsFromXML[kv.first].get_name()) == getsymbolTableToServerMap().end()) {
+      if ( getsymbolTableFromServerMap().find(AllVarsFromXML[kv.first].get_name()) == getsymbolTableToServerMap().end()) {
 
       } else {
-        getsymbolTableFromServerMap()[AllVarsFromXML[key].get_name()]->set_value(value);
+        getsymbolTableFromServerMap()[AllVarsFromXML[kv.first].get_name()]->set_value(kv.second);
       }
     } else {
-      getsymbolTableToServerMap()[AllVarsFromXML[key].get_name()]->set_value(value);
+      getsymbolTableToServerMap()[AllVarsFromXML[kv.first].get_name()]->set_value(kv.second);
     }
   }
+  setMutexUnlocked();
+}
+void Singleton::setMutexLocked() {
+  this->Mutex.lock();
+}
+void Singleton::setMutexUnlocked() {
+  this->Mutex.unlock();
 }

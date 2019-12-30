@@ -15,7 +15,6 @@
 #include "ex1.h"
 #include "Client.h"
 
-void SleepFunc(int x);
 
 int OpenServerCommand::execute(vector<string> &str, int i) {
 
@@ -153,6 +152,7 @@ int DefineVarCommand::execute(vector<string> &str, int i) {
 int SimCommand::execute(vector<string> &str, int i) {
   int j = 0;
   Singleton* t = t->getInstance();
+  t->setMutexLocked();
   string temp = str.at(i+2);
   const char* start = &(temp[0]);
   const char* end = &(temp[temp.size()-1]);
@@ -168,6 +168,7 @@ int SimCommand::execute(vector<string> &str, int i) {
   } else if(binding=="<-") {
     j = t->getCommandMap()[binding]->execute(str,i);
   }
+  t->setMutexUnlocked();
   return j;
 }
 int setToClientCommand::execute(vector<string> &str, int i) {
@@ -222,6 +223,7 @@ int assignCommand::execute(vector<string> &str, int i) {
   Var_Data *ptr = nullptr;
   int whichMap=0;
   Singleton* t = t->getInstance();
+  t->setMutexUnlocked();
   float d = calculateMathExpression(str.at(i+1));
     str_val = to_string(d);
     whichMap=WhichMapToPutVariable(str.at(i-1));
@@ -260,15 +262,14 @@ int assignCommand::execute(vector<string> &str, int i) {
     default:
       break;
   }
+  t->setMutexUnlocked();
   return 2;
 }
 int SleepCommand::execute(vector<string> &str, int i) {
   int sleeptime=0;
   try {
     sleeptime = stoi(str.at(i + 1));
-    SleepFunc(sleeptime);
-    //std::thread thread1(SleepFunc,sleeptime);
-    //thread1.join();
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleeptime));
   }
   catch(...) {
     throw "there was a problem with given integer to Sleep command";
@@ -292,47 +293,11 @@ int WhileCommand::execute(vector<string> &str, int i) {
   }
   operand1 = getFloatValuefromString(sin->getVector(),i+1);
   operand2 = getFloatValuefromString(sin->getVector(),i+3);
-
-  if(str.at(i+2) == ">") {
-    while (operand1 > operand2) {
-      gothroughloop(j,j+count);
-      operand1 = getFloatValuefromString(sin->getVector(),i+1);
-      operand2 = getFloatValuefromString(sin->getVector(),i+3);
-    }
-  } else if(str.at(i+2) == "<") {
-    while (operand1 < operand2) {
-      gothroughloop(j,j+count);
-      operand1 = getFloatValuefromString(sin->getVector(),i+1);
-      operand2 = getFloatValuefromString(sin->getVector(),i+3);
-    }
-  } else if(str.at(i+2) == ">=") {
-    while (operand1 >= operand2) {
-      gothroughloop(j,j+count);
-      operand1 = getFloatValuefromString(sin->getVector(),i+1);
-      operand2 = getFloatValuefromString(sin->getVector(),i+3);
-    }
-  } else if(str.at(i+2) == "<=") {
-    while (operand1 <= operand2) {
-      gothroughloop(j,j+count);
-      operand1 = getFloatValuefromString(sin->getVector(),i+1);
-      operand2 = getFloatValuefromString(sin->getVector(),i+3);
-    }
-  } else if(str.at(i+2) == "==") {
-    while (operand1 == operand2) {
-      gothroughloop(j,j+count);
-      operand1 = getFloatValuefromString(sin->getVector(),i+1);
-      operand2 = getFloatValuefromString(sin->getVector(),i+3);
-    }
-  } else if(str.at(i+2) == "!=") {
-    while (operand1 != operand2) {
-      gothroughloop(j,j+count);
-      operand1 = getFloatValuefromString(sin->getVector(),i+1);
-      operand2 = getFloatValuefromString(sin->getVector(),i+3);
-    }
-  } else {
-    throw "math operator invalid";
+  while(checkCondition(operand1,operand2,str.at(i+2)) == 1) {
+    gothroughloop(j, j + count);
+    operand1 = getFloatValuefromString(sin->getVector(),i+1);
+    operand2 = getFloatValuefromString(sin->getVector(),i+3);
   }
-
   return (j+count+1)-i;
 }
 int IfCommand::execute(vector<string> &str, int i) {
@@ -353,41 +318,10 @@ int IfCommand::execute(vector<string> &str, int i) {
   operand1 = getFloatValuefromString(sin->getVector(),i+1);
   operand2 = getFloatValuefromString(sin->getVector(),i+3);
 
-  if(str.at(i+2) == ">") {
-    if (operand1 > operand2) {
-      gothroughloop(j,j+count);
-    }
-  } else if(str.at(i+2) == "<") {
-    if (operand1 < operand2) {
-      gothroughloop(j,j+count);
-    }
-  } else if(str.at(i+2) == ">=") {
-    if (operand1 >= operand2) {
-      gothroughloop(j,j+count);
-    }
-  } else if(str.at(i+2) == "<=") {
-    if (operand1 <= operand2) {
-      gothroughloop(j,j+count);
-    }
-
-  } else if(str.at(i+2) == "==") {
-    if (operand1 == operand2) {
-      gothroughloop(j,j+count);
-    }
-  } else if(str.at(i+2) == "!=") {
-    if(operand1!=operand2) {
-      gothroughloop(j, j + count);
-    }
-  } else {
-    throw "math operator invalid";
+  if(checkCondition(operand1,operand2,str.at(i+2)) == 1) {
+    gothroughloop(j, j + count);
   }
-
   return (j+count+1)-i;
-}
-void SleepFunc(int g) {
-  Singleton* t = t->getInstance();
-  //cout << "encounter sleep command in Fly.txt. sleep for "  << x << " milliseconds" << endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(g));
 }
 void gothroughloop(int startofloop, int endofloop) { //help to run commands in curky brackets in if\while statement
   Singleton *sin = sin->getInstance();
