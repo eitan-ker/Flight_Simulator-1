@@ -38,7 +38,9 @@ int main(int argc, char const *argv[])
     }
 
     //if here we made a connection
+// message to send into the sever(game)
     char hello[] = "Hi from client";
+// "hello" - char[] to send as message
     int is_sent = send(client_socket , hello , strlen(hello) , 0 );
     if (is_sent == -1) {
         std::cout<<"Error sending message"<<std::endl;
