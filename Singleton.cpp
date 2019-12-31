@@ -7,7 +7,9 @@
 using namespace std;
 
 Singleton *Singleton::instance = 0;
-
+/*
+ * private contructor, instance created only once
+ */
 Singleton::Singleton() {
   OpenServerCommand* os = new OpenServerCommand;
   ConnectCommand* cc = new ConnectCommand;
@@ -50,7 +52,7 @@ vector<string> &Singleton::getVector() {
   return this->str_array;
 }
 
-map<string, Command *>& Singleton::getCommandMap() {
+map<string, Command*>& Singleton::getCommandMap() {
   return this->strToCommandMap;
 }
 
@@ -69,19 +71,22 @@ vector<string> &Singleton::getArrayOfOrdersToServer() {
 
 
 Var_Data* Singleton::getVar_Data(string& str) {
+  // search for the key(parameter) in my From and To game maps and return the pointer at the end
   if (getsymbolTableToServerMap().find(str) == getsymbolTableToServerMap().end()) {
     if (getsymbolTableFromServerMap().find(str) == getsymbolTableToServerMap().end()) {
       throw "variable doesnt exist in Maps";
     } else {
+      Var_Data* temp = getsymbolTableFromServerMap()[str];
+      return temp;
     }
-    Var_Data* temp = getsymbolTableFromServerMap()[str];
-    return temp;
   } else {
     Var_Data* temp = getsymbolTableToServerMap()[str];
     return temp;
   }
 }
-
+/*
+ * initialize generic_smallMap each time new data comes from game
+ */
 void Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     string::size_type sz;
     float value = stof(buf_to_value, &sz);
@@ -199,17 +204,26 @@ map<string,ValueAndNameObject>& Singleton::getAllVarsFromXMLMMap() {
 }
 void Singleton::InitializationofAllVarsFromXML() {
   map<string, float>::iterator it;
-
-  for (const auto& [key, value]: generic_smallMap) {
-    AllVarsFromXML[key].set_value(value);
-    if (getsymbolTableToServerMap().find(AllVarsFromXML[key].get_name()) == getsymbolTableToServerMap().end()) {
-      if ( getsymbolTableFromServerMap().find(AllVarsFromXML[key].get_name()) == getsymbolTableToServerMap().end()) {
+  setMutexLocked();
+  for (const auto& kv : generic_smallMap) {
+    AllVarsFromXML[kv.first].set_value(kv.second);
+      if ( getsymbolTableFromServerMap().find(AllVarsFromXML[kv.first].get_name()) == getsymbolTableToServerMap().end()) {
 
       } else {
-        getsymbolTableFromServerMap()[AllVarsFromXML[key].get_name()]->set_value(value);
+        getsymbolTableFromServerMap()[AllVarsFromXML[kv.first].get_name()]->set_value(kv.second);
       }
-    } else {
-      getsymbolTableToServerMap()[AllVarsFromXML[key].get_name()]->set_value(value);
     }
-  }
+  setMutexUnlocked();
+}
+/*
+ * public method to lock the mutex
+ */
+void Singleton::setMutexLocked() {
+  this->Mutex.lock();
+}
+/*
+ * public method to unlock the mutex
+ */
+void Singleton::setMutexUnlocked() {
+  this->Mutex.unlock();
 }
