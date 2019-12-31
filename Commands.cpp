@@ -15,7 +15,9 @@
 #include "ex1.h"
 #include "Client.h"
 
-
+/*
+ * open server command execute function
+ */
 int OpenServerCommand::execute(vector<string> &str, int i) {
 
     // if there is a problem with the connection what do we return?
@@ -127,10 +129,11 @@ void ConnectCommand::executeConnect(int client_socket) {
 
 int DefineVarCommand::execute(vector<string> &str, int i) {
   int j = 0;
-  Singleton* t = t->getInstance();
-  string c = str.at(i+2);
-  string d = str.at(i+3);
-  string var = str.at(i+1);
+  Singleton* t = t->getInstance(); //get instance of the database first
+  t->setMutexLocked();//first of all, lock the DB until the command is finished
+  string c = str.at(i+2); //get the sign in var command in fly.txt
+  string d = str.at(i+3);//get the sim word from vector
+  string var = str.at(i+1); //get the name of the new variable in fly.txt
   if(c=="=") {
     Var_Data* temp = t->getVar_Data(d);
     if (t->getsymbolTableToServerMap().find(d) == t->getsymbolTableToServerMap().end()) {
@@ -142,18 +145,19 @@ int DefineVarCommand::execute(vector<string> &str, int i) {
       t->getsymbolTableToServerMap().emplace(var,temp);
     }
     j+=1;
-  } else if(c=="->" || c=="<-" ) {
+  } else if(c=="->" || c=="<-" ) { //move to relevent command and keep it from there
     j = t->getCommandMap()[d]->execute(str, i+2);
     j+=2;
   }
+  t->setMutexUnlocked();
   return j;
 }
 
 int SimCommand::execute(vector<string> &str, int i) {
   int j = 0;
-  Singleton* t = t->getInstance();
-  t->setMutexLocked();
-  string temp = str.at(i+2);
+  Singleton* t = t->getInstance();//get instance of DB
+  t->setMutexLocked(); //first of all, lock the DB until the command is finished
+  string temp = str.at(i+2);//get the string which is the path of sim
   const char* start = &(temp[0]);
   const char* end = &(temp[temp.size()-1]);
   if(*start != '\"' || *end!= '\"') {
@@ -163,12 +167,12 @@ int SimCommand::execute(vector<string> &str, int i) {
   temp = temp.substr(1,temp.size()-2);
   string binding = str.at(i);
 
-  if(binding=="->") {
+  if(binding=="->") { //call to setToClientCommand which stores new var in the symbolTableToServer map
     j = t->getCommandMap()[binding]->execute(str,i);
-  } else if(binding=="<-") {
+  } else if(binding=="<-") { //call to setToClientCommand which stores new var in the symbolTableFromServer map
     j = t->getCommandMap()[binding]->execute(str,i);
   }
-  t->setMutexUnlocked();
+  t->setMutexUnlocked();//unlock mutex after the maps update is done
   return j;
 }
 int setToClientCommand::execute(vector<string> &str, int i) {
@@ -182,14 +186,19 @@ int setToClientCommand::execute(vector<string> &str, int i) {
 int setToSimulatorCommand::execute(vector<string> &str, int i) {
   Singleton* t = t->getInstance();
   string simpath = str.at(i+2).substr(1,str.at(i+2).size()-2);
-  Var_Data* temp = new Var_Data{t->getAllVarsFromXMLMMap()[simpath].get_value(),simpath};
-  t->getAllVarsFromXMLMMap()[simpath].set_name(str.at(i-1));
-  t->getsymbolTableToServerMap().emplace(str.at(i-1),temp);
+  Var_Data* temp = new Var_Data{t->getAllVarsFromXMLMMap()[simpath].get_value(),simpath};//create new float,sim object in the heap
+  t->getAllVarsFromXMLMMap()[simpath].set_name(str.at(i-1));/*set the name of the variable in the main getAllVarsFromXMLMMap according to given name in fly.txt
+  from now on we can access the variable using this name*/
+  t->getsymbolTableToServerMap().emplace(str.at(i-1),temp);//insert the new name,(float,sim) object pair to symbolTableToServer map
   return 3;
 }
+/*
+ * helper function to get value of vairable from DB
+ */
 float findValueOfVarInMap(string var) {
   float j = 0;
   Singleton* t = t->getInstance();
+  t->setMutexLocked();//lock mutex to prevent collision when accessing to variable data
   if (t->getsymbolTableToServerMap().find(var) == t->getsymbolTableToServerMap().end()) {
     if (t->getsymbolTableFromServerMap().find(var) == t->getsymbolTableToServerMap().end()) {
       throw "error: variable not found";
@@ -199,8 +208,12 @@ float findValueOfVarInMap(string var) {
   } else {
     j = t->getsymbolTableToServerMap()[var]->get_value();
   }
+  t->setMutexUnlocked();//unlock mutex
   return j;
 }
+/*
+ * print command, find the variable name at the DB and print its value
+ */
 int PrintCommand::execute(vector<string> &str, int i) {
   string temp = str.at(i+1);
   string str_val="";
@@ -223,13 +236,13 @@ int assignCommand::execute(vector<string> &str, int i) {
   Var_Data *ptr = nullptr;
   int whichMap=0;
   Singleton* t = t->getInstance();
-  t->setMutexUnlocked();
-  float d = calculateMathExpression(str.at(i+1));
-    str_val = to_string(d);
-    whichMap=WhichMapToPutVariable(str.at(i-1));
-  var = str.at(i-1);
+  t->setMutexLocked();//lock the DB while update is in proccess
+  float d = calculateMathExpression(str.at(i+1)); //get value from coplex expression
+    str_val = to_string(d);//cast value to string
+    whichMap=WhichMapToPutVariable(str.at(i-1));//decide in which map in DB to store the new value\variable
+  var = str.at(i-1); //name of the new variable in fly.txt
   switch(whichMap) {
-    case ISNTINMAPS: {
+    case ISNTINMAPS: {//the variable doesnt exist in the maps yet
       if (t->getsymbolTableToServerMap().find(str.at(i + 1)) == t->getsymbolTableToServerMap().end()) {
         notavariable = 1;
         if (t->getsymbolTableFromServerMap().find(str.at(i + 1)) == t->getsymbolTableToServerMap().end()) {
@@ -245,24 +258,25 @@ int assignCommand::execute(vector<string> &str, int i) {
       }
     }
       break;
-    case ISINFROMSERVERMAP: {
-      t->getsymbolTableFromServerMap()[var]->set_value(d);
-      str_val = t->getsymbolTableFromServerMap()[var]->get_sim();
-      t->getAllVarsFromXMLMMap()[str_val].set_value(d);
+    case ISINFROMSERVERMAP: { // the variable exists in the symbolTableFromServer map
+      t->getsymbolTableFromServerMap()[var]->set_value(d);//update the variable pair in map
+      str_val = t->getsymbolTableFromServerMap()[var]->get_sim();//update the variable pair in map
+      t->getAllVarsFromXMLMMap()[str_val].set_value(d);//update the variable pair in AllVarsFromXMLMMap
     }
       break;
-    case ISINTOSERVERMAP: {
+    case ISINTOSERVERMAP: {// the variable exists in the symbolTableToServer map
+      //send order to game to update the value of the variable according to its sim stored in the DB
       t->getArrayOfOrdersToServer().emplace(t->getArrayOfOrdersToServer().end(), "set " +
           t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim().substr(1,t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim().size() - 1) + " "+ str_val + "\r\n");
-      t->getsymbolTableToServerMap()[str.at(i - 1)]->set_value(d);
-      string sim_path = t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim();
-      t->getAllVarsFromXMLMMap()[sim_path].set_value(d);
+      t->getsymbolTableToServerMap()[str.at(i - 1)]->set_value(d);//update the variable pair in map
+      string sim_path = t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim();//update the variable pair in map
+      t->getAllVarsFromXMLMMap()[sim_path].set_value(d);//update the variable pair in AllVarsFromXMLMMap
     }
       break;
     default:
       break;
   }
-  t->setMutexUnlocked();
+  t->setMutexUnlocked();//finished working on DB, unlock Mutex
   return 2;
 }
 int SleepCommand::execute(vector<string> &str, int i) {
@@ -382,6 +396,9 @@ float calculateMathExpression(string str) {//calculate complex math expression i
   }
   return result;
 }
+/*
+ * create vector which consists the string given as a parameter seperated according to regex criteria
+ */
 void buildVectorFromString(vector<string>& vec, string& str) {
   float value = 0;
   vector<string> array_of_opearators  {"-","+","*","/","(",")"};
@@ -418,7 +435,7 @@ void buildVectorFromString(vector<string>& vec, string& str) {
         vec.emplace(vec.end(),c);
         start=token;
       }
-    } else {
+    } else {//encoutered operator
       string e = "";
       e+=(*token);
       it = find(array_of_opearators.begin(),array_of_opearators.end(),e);
@@ -432,6 +449,9 @@ void buildVectorFromString(vector<string>& vec, string& str) {
       }
     }
 }
+/*
+ * helper function to tell where in the DB i can find\update variable's value
+ */
 int WhichMapToPutVariable(string& str) {
   Singleton* t = t->getInstance();
   int whichMap = 0;

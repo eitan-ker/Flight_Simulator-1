@@ -7,7 +7,9 @@
 using namespace std;
 
 Singleton *Singleton::instance = 0;
-
+/*
+ * private contructor, instance created only once
+ */
 Singleton::Singleton() {
   OpenServerCommand* os = new OpenServerCommand;
   ConnectCommand* cc = new ConnectCommand;
@@ -69,6 +71,7 @@ vector<string> &Singleton::getArrayOfOrdersToServer() {
 
 
 Var_Data* Singleton::getVar_Data(string& str) {
+  // search for the key(parameter) in my From and To game maps and return the pointer at the end
   if (getsymbolTableToServerMap().find(str) == getsymbolTableToServerMap().end()) {
     if (getsymbolTableFromServerMap().find(str) == getsymbolTableToServerMap().end()) {
       throw "variable doesnt exist in Maps";
@@ -81,7 +84,9 @@ Var_Data* Singleton::getVar_Data(string& str) {
     return temp;
   }
 }
-
+/*
+ * initialize generic_smallMap each time new data comes from game
+ */
 void Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     string::size_type sz;
     float value = stof(buf_to_value, &sz);
@@ -214,9 +219,15 @@ void Singleton::InitializationofAllVarsFromXML() {
   }
   setMutexUnlocked();
 }
+/*
+ * public method to lock the mutex
+ */
 void Singleton::setMutexLocked() {
   this->Mutex.lock();
 }
+/*
+ * public method to unlock the mutex
+ */
 void Singleton::setMutexUnlocked() {
   this->Mutex.unlock();
 }

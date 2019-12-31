@@ -4,14 +4,14 @@
 #include "Var_Data.h"
 #include <vector>
 
-enum WHiCHMAP { ISNTINMAPS, ISINFROMSERVERMAP, ISINTOSERVERMAP };
+enum WHiCHMAP { ISNTINMAPS, ISINFROMSERVERMAP, ISINTOSERVERMAP }; //help to find where the variable to update its value/place into according to value assigned to it in fly.txt
 using namespace std;
-float findValueOfVarInMap(string var);
-float getFloatValuefromString(const vector<string> &str, int i);
-void buildVectorFromString(vector<string>& vec, string& str);
-float calculateMathExpression(string str);
-void gothroughloop(int startofloop, int endofloop);
-int WhichMapToPutVariable(string& str);
+float findValueOfVarInMap(string var); //give the name key and return its value
+float getFloatValuefromString(const vector<string> &str, int i);//helper function to calculate value of complex string with strings instead of number and return the float value result
+void buildVectorFromString(vector<string>& vec, string& str);//helper function to calculate value of complex string with strings instead of number and return the float value result
+float calculateMathExpression(string str);//main function to calculate complex expression, uses "buildVectorFromString" and "getFloatValuefromString" functions
+void gothroughloop(int startofloop, int endofloop); //function to iterate through statement in while\if curly braces from fly.txt
+int WhichMapToPutVariable(string& str);//function to analyze to which map to habit the variable from fly.txt
 class Command {
  public:
   virtual int execute(vector<string> &str, int i) = 0;

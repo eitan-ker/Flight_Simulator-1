@@ -9,6 +9,10 @@
 
 #include <string>
 using namespace std;
+/*
+	* class of te object which stores float value and name of the variable, attach to variable's simpath in pair
+	* by default, its name will be the simpath until encounter a request to change the name in fly.txt
+*/
 class ValueAndNameObject {
 
  private:

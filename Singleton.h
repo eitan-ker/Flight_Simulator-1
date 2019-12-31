@@ -19,15 +19,22 @@
 #include <regex>
 #include <sstream>
 using namespace std;
+/*
+ * Database class to keep all STL objects, class is implemented according to Singleton design pattern.
+ * the constructor is private and only one instance of the class is created and everyone get the same object
+ */
 class Singleton {
  private:
-  vector<string> str_array;
+  vector<string> str_array; //vector that contains the strings from fly.txt seperated
   mutex Mutex;
-  map<string,Command*> strToCommandMap;//this is the map of string-command relation
-  map<string,Var_Data*> symbolTableToServer;//this the map to store data that we want to send to server
-  map<string,Var_Data*> symbolTableFromServer; //this is the map to store data we got from server
+  map<string,Command*> strToCommandMap;//this is the map of string-command relation, key is the name of command and value is pointer to command object in the heap
+  map<string,Var_Data*> symbolTableToServer;//this the map to store variables that we want to send to server, key is the name of the variable and value is object of float and sim
+  map<string,Var_Data*> symbolTableFromServer; //this is the map to store data we got from server,key is the name of the variable and value is object of float and sim
   map<string,float> generic_smallMap = {}; //this is the temporary map to store string and float from ‫‪generic_small.xml‬‬
-  map<string,ValueAndNameObject> AllVarsFromXML = { {"/instrumentation/airspeed-indicator/indicated-speed-kt",{0,"/instrumentation/airspeed-indicator/indicated-speed-kt"}},
+  map<string,ValueAndNameObject> AllVarsFromXML = //this is the map which stores all variables from game where value = sim and value is an object of float and name,
+      //the name will be the sim by default until encountered var key word in file
+       {
+      {"/instrumentation/airspeed-indicator/indicated-speed-kt",{0,"/instrumentation/airspeed-indicator/indicated-speed-kt"}},
       {"/sim/time/warp",{0,"/sim/time/warp"}},
       {"/controls/switches/magnetos",{0,"/controls/switches/magnetos"}},
       {"/instrumentation/heading-indicator/offset-deg",{0,"/instrumentation/heading-indicator/offset-deg"}},
@@ -65,23 +72,23 @@ class Singleton {
       {"/engines/engine/rpm",{0,"/engines/engine/rpm"}}
   }; //this is the map to store data from ‫‪generic_small.xml‬‬
   vector<string> orderToSendToSimulator;//this is the string vector which will store all new set commands to send to the simulator. you send a single set and then delete it
-  static Singleton* instance;
+  static Singleton* instance; //static instance of Singleton,created only once
   Singleton(); // will be called only when calling getInstance
  public:
   void setMutexLocked();
   void setMutexUnlocked();
-  static Singleton *getInstance();
-  vector<string>& getVector();
-  map<string,Var_Data*>& getsymbolTableToServerMap();
-  map<string,Var_Data*>& getsymbolTableFromServerMap();
-  map<string,Command*>& getCommandMap();
-  map<string,float>& getgeneric_smallMap();
-  Var_Data* getVar_Data(string& str);
-  void InitializationofAllVarsFromXML();
-  map<string,ValueAndNameObject>& getAllVarsFromXMLMMap();
-  void set_generic_smallMap(string buf_to_value, int sim_index);
-  vector<string>& getArrayOfOrdersToServer();
-  ~Singleton(){
+  static Singleton *getInstance(); //get pointer to Singleton object from anywhere in the code
+  vector<string>& getVector(); //return reference of the str_array vector
+  map<string,Var_Data*>& getsymbolTableToServerMap(); // return reference of symbolTableToServerMap
+  map<string,Var_Data*>& getsymbolTableFromServerMap();// return reference of symbolTableFromServerMap
+  map<string,Command*>& getCommandMap(); // return reference of strToCommandMap
+  map<string,float>& getgeneric_smallMap(); // return refernce of genereic xml map
+  Var_Data* getVar_Data(string& str); //return pointer to the space in the heap where the object of float and sim is stored
+  void InitializationofAllVarsFromXML(); //initialize the map from generic xml map after it was updated by values from game
+  map<string,ValueAndNameObject>& getAllVarsFromXMLMMap();// return refernce of AllVarsFromXMLMMap map
+  void set_generic_smallMap(string buf_to_value, int sim_index); //initialize the map each time new data comes from the game
+  vector<string>& getArrayOfOrdersToServer(); // return refernce of orderToSendToSimulator vector
+  ~Singleton(){ //class destructor which frees all of the allocated space in the heap
     map<string,Command*>:: iterator it=strToCommandMap.begin();
     for(;it!=strToCommandMap.end(); ++it) {
       delete it->second;

@@ -26,23 +26,23 @@ int main(int argc, char *argv[]);
 void check_line(string &line, vector<string> &str_array) {
     const char *token = &(line[0]);
     const char *start = token;
-    int foundpattern = 0, enterstringtoarray = 0, counter = 0, skipfound_patternflag=0,check_equal_sign=0;
+    int foundpattern = 0, enterstringtoarray = 0, skipfound_patternflag=0,check_equal_sign=0;
     string c;
     regex r1("[0-9]*[.][ ]");
-    if (*token == '/') {
+    if (*token == '/') { //encountered comment
         token++;
         if (*token == '/') {
             return;
         }
     }
     start = token;
-    while (*token != '\0' && *token != '\n' && *token != '\r') {
-      skipfound_patternflag=0;
-        if (*token == '\t') {
+    while (*token != '\0' && *token != '\n' && *token != '\r') { //start iterating over the line char by chaar
+      skipfound_patternflag=0; // first of all at each iteration zero the found word flag
+        if (*token == '\t') {//encountered tab
             token++;
             start = token;
         }
-        if(check_equal_sign==1) {
+        if(check_equal_sign==1) {//encountered equal sign at last iteration, now take everything after it and put it as one string
           check_equal_sign=0;
           start=token;
           while(*token!='\n' && *token!='{' && *token!='}' && *token != '\0' ) {
@@ -50,31 +50,18 @@ void check_line(string &line, vector<string> &str_array) {
           }
           foundpattern++;
         }
-      /*if( *token == '{') {
-        start=token;
-        token++;
-        while(*token !='}') {
-          token++;
-        }
-        string f(start,token);
-        for (int i = 0; i < c.length(); ++i) {
-          if (c[i] == '\n')
-            c[i] = ',';
-        }
-        str_array.insert(str_array.end(), f);
-      }*/
-        if( *token == '\"') {
+        if( *token == '\"') {//encountered comment in the middle of analyzing the string
           start=token;
           token++;
           while(*token !='\"') {
             token++;
           }
-          skipfound_patternflag=1;
+          skipfound_patternflag=1; //dont insert this string to the string vector
         }
-        if (*token == ' '  || *token == '(' || *token == ')' || *token == ',') {
+        if (*token == ' '  || *token == '(' || *token == ')' || *token == ',') { //if i encounter one of these sign, i put everything i gathered until these sign and add to vector
             foundpattern = 1;
         }
-        if (foundpattern == 1 && skipfound_patternflag==0) {
+        if (foundpattern == 1 && skipfound_patternflag==0) {//i have now a start char and end char and i want to make a string out of them and push to my string vector
             foundpattern = 0;
             enterstringtoarray = 1;
             string key_str(start, token);
@@ -87,13 +74,13 @@ void check_line(string &line, vector<string> &str_array) {
               if(*token!='\0' && *token!='{' && *token!='}') {
                 token++;
               }
-              if(*token=='{') {
+              if(*token=='{') {//insert curly braces to vector
                 c = "{";
                 str_array.insert(str_array.end(), c);
                 token++;
                 start=token;
               }
-              if(*token=='}') {
+              if(*token=='}') { //insert curly braces to vector
                 c = "}";
                 str_array.insert(str_array.end(), c);
                 token++;
@@ -101,7 +88,7 @@ void check_line(string &line, vector<string> &str_array) {
               }
                 start = token;
             } else {
-                return; //encounter comment
+                return;
             }
         }
         if (enterstringtoarray == 0) {
@@ -157,7 +144,7 @@ int main(int argc, char *argv[]) {
     Singleton *database = database->getInstance();
     lexer(argv[1], database->getVector());
     parser(database->getVector());
-    a=0;
+    database->InitializationofAllVarsFromXML();
   //val = calculateMathExpression("-1.000*80");
     return 0;
 }

@@ -6,6 +6,10 @@
 #define FLIGHTSIMULATOR__VAR_DATA_H_
 #include <string>
 using namespace std;
+/*
+	* class of te object which stores float value and sim path, attach to variable's name in pair
+	*
+*/
 class Var_Data {
 
 private:
