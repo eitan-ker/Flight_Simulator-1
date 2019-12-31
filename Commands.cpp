@@ -78,11 +78,8 @@ int OpenServerCommand::execute(vector<string> &str, int i) {
 
 
 void OpenServerCommand::executeServer(int client_socket) {
-  Singleton* t = t->getInstance();
-  t->setMutexLocked(); // locked Mutex, initiate open server
     Server *server = new Server();
     server->runServer(client_socket);
-    t->setMutexUnlocked();//open server command has established a connection between game and server. now you can unlock Mutex
 }
 
 int ConnectCommand::execute(vector<string> &str, int i) {
@@ -268,7 +265,7 @@ int assignCommand::execute(vector<string> &str, int i) {
     case ISINTOSERVERMAP: {// the variable exists in the symbolTableToServer map
       //send order to game to update the value of the variable according to its sim stored in the DB
       t->getArrayOfOrdersToServer().emplace(t->getArrayOfOrdersToServer().end(), "set " +
-          t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim().substr(1,t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim().size() - 1) + " "+ str_val + "\r\n");
+          t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim().substr(1,t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim().size() - 1) + " "+ str_val+"\r\n" );
       t->getsymbolTableToServerMap()[str.at(i - 1)]->set_value(d);//update the variable pair in map
       string sim_path = t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim();//update the variable pair in map
       t->getAllVarsFromXMLMMap()[sim_path].set_value(d);//update the variable pair in AllVarsFromXMLMMap
