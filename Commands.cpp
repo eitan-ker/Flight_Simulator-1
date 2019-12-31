@@ -78,11 +78,16 @@ int OpenServerCommand::execute(vector<string> &str, int i) {
 
 
 void OpenServerCommand::executeServer(int client_socket) {
+  Singleton* t = t->getInstance();
+  t->setMutexLocked(); // locked Mutex, initiate open server
     Server *server = new Server();
     server->runServer(client_socket);
+    t->setMutexUnlocked();//open server command has established a connection between game and server. now you can unlock Mutex
 }
 
 int ConnectCommand::execute(vector<string> &str, int i) {
+  Singleton *t = t->getInstance();
+  t->getArrayOfOrdersToServer(); ///in this case, the getArrayOfOrdersToServer function will have to wait till the Mutex is unlocked
     string ip_to_connect = str[i + 1];
     const char *token = &(ip_to_connect[0]);
     stringstream strng(str[i + 2]);

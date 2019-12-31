@@ -207,16 +207,12 @@ void Singleton::InitializationofAllVarsFromXML() {
   setMutexLocked();
   for (const auto& kv : generic_smallMap) {
     AllVarsFromXML[kv.first].set_value(kv.second);
-    if (getsymbolTableToServerMap().find(AllVarsFromXML[kv.first].get_name()) == getsymbolTableToServerMap().end()) {
       if ( getsymbolTableFromServerMap().find(AllVarsFromXML[kv.first].get_name()) == getsymbolTableToServerMap().end()) {
 
       } else {
         getsymbolTableFromServerMap()[AllVarsFromXML[kv.first].get_name()]->set_value(kv.second);
       }
-    } else {
-      getsymbolTableToServerMap()[AllVarsFromXML[kv.first].get_name()]->set_value(kv.second);
     }
-  }
   setMutexUnlocked();
 }
 /*
