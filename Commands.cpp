@@ -156,7 +156,6 @@ int DefineVarCommand::execute(vector<string> &str, int i) {
 int SimCommand::execute(vector<string> &str, int i) {
   int j = 0;
   Singleton* t = t->getInstance();//get instance of DB
-  t->setMutexLocked(); //first of all, lock the DB until the command is finished
   string temp = str.at(i+2);//get the string which is the path of sim
   const char* start = &(temp[0]);
   const char* end = &(temp[temp.size()-1]);
@@ -172,7 +171,6 @@ int SimCommand::execute(vector<string> &str, int i) {
   } else if(binding=="<-") { //call to setToClientCommand which stores new var in the symbolTableFromServer map
     j = t->getCommandMap()[binding]->execute(str,i);
   }
-  t->setMutexUnlocked();//unlock mutex after the maps update is done
   return j;
 }
 int setToClientCommand::execute(vector<string> &str, int i) {
@@ -198,7 +196,6 @@ int setToSimulatorCommand::execute(vector<string> &str, int i) {
 float findValueOfVarInMap(string var) {
   float j = 0;
   Singleton* t = t->getInstance();
-  t->setMutexLocked();//lock mutex to prevent collision when accessing to variable data
   if (t->getsymbolTableToServerMap().find(var) == t->getsymbolTableToServerMap().end()) {
     if (t->getsymbolTableFromServerMap().find(var) == t->getsymbolTableToServerMap().end()) {
       throw "error: variable not found";
@@ -208,7 +205,6 @@ float findValueOfVarInMap(string var) {
   } else {
     j = t->getsymbolTableToServerMap()[var]->get_value();
   }
-  t->setMutexUnlocked();//unlock mutex
   return j;
 }
 /*
