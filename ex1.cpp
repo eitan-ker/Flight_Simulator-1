@@ -100,7 +100,7 @@ double Interpreter::performOp(double num1, double num2, string op) {
     if (op == "+") {
         return num1 + num2;
     } else if (op == "-") {
-        return num1 - num2;
+        return num2 - num1;
     } else if (op == "*") {
         return num1 * num2;
     } else {
@@ -400,36 +400,6 @@ Expression* Interpreter::interpret(const string str) {
             outputQueue.emplace("0");
             ++input;
         }
-        /*if (isalpha(*input)) {
-          const char* star = input;
-          input++;
-          if (isdigit(*input)) {
-            ++input;
-            if (*input == '_') {
-              input++;
-              if (isdigit(*input)) {
-                input++;
-              } else {
-                throw "bad input";
-              }
-            }
-            string str_key(star, input);
-            if (Varmap.find(str_key) == Varmap.end()) {
-              throw "error: variable not found";
-            } else {
-              string str_val = to_string(Varmap[str_key]);
-              outputQueue.emplace(str_val);
-            }
-          } else {
-            string str_key(star, input);
-            string str_val = to_string(Varmap[str_key]);
-            outputQueue.emplace(str_val);
-            if (*input != '\0' && *input != '+' && *input != '*' &&
-            *input != '/' && *input != '-' && *input != ')') {
-              ++input;
-            }
-          }
-        }*/
         if (isdigit(*input)) {
             const char* start = input;
             while (isdigit(*input) || *input == '.') {

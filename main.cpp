@@ -144,7 +144,6 @@ int main(int argc, char *argv[]) {
     Singleton *database = database->getInstance();
     lexer(argv[1], database->getVector());
     parser(database->getVector());
-    database->InitializationofAllVarsFromXML();
-  //val = calculateMathExpression("-1.000*80");
+  //double val = calculateMathExpression("(h0 - heading)/80");
     return 0;
 }
