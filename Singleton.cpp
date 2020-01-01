@@ -101,11 +101,6 @@ void Singleton ::set_generic_smallMap(string buf_to_value, int sim_index) {
     }
     if (sim_index == 4) {
         this->AllVarsFromXML["/instrumentation/heading-indicator/offset-deg"].set_value(value);
-      if (getsymbolTableFromServerMap().find(AllVarsFromXML["/instrumentation/heading-indicator/offset-deg"].get_name()) == getsymbolTableToServerMap().end()) {
-
-      } else {
-        getsymbolTableFromServerMap()[AllVarsFromXML["/instrumentation/heading-indicator/offset-deg"].get_name()]->set_value(value);
-      }
     }
     if (sim_index == 5) {
         this->AllVarsFromXML["/instrumentation/altimeter/indicated-altitude-ft"].set_value(value);
@@ -239,7 +234,7 @@ void Singleton::deleteAllElementsinOrdersToArrayVector() {
 }
 void Singleton::updateFromSimulatorTable() {
   setMutexLocked();
-  for (auto it=symbolTableFromServer.begin(); it!=symbolTableFromServer.end(); ++it) {
+  for (auto it=symbolTableFromServer.begin();it!=symbolTableFromServer.end(); ++it) {
     it->second->set_value(AllVarsFromXML[it->second->get_sim()].get_value());
   }
   setMutexUnlocked();
