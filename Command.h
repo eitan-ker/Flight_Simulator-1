@@ -35,7 +35,7 @@ class ConditionalParser: public Command {
  public:
   virtual int execute(vector<string> &str, int i) = 0;
   int checkCondition(float operand1, float operand2, string op) {
-    if (op.compare("<")) {
+    if (op.compare("<") == 0) {
       if(operand1<operand2) {
         return 1;
       }
@@ -43,7 +43,7 @@ class ConditionalParser: public Command {
         return 0;
       }
     }
-    if (op.compare("==")) {
+    if (op.compare("==") == 0) {
       if(operand1==operand2) {
         return 1;
       }
@@ -51,15 +51,15 @@ class ConditionalParser: public Command {
         return 0;
       }
     }
-    if (op.compare(">")) {
-      if(operand1>=operand2) {
+    if (op.compare(">") == 0) {
+      if(operand1>operand2) {
         return 1;
       }
       else {
         return 0;
       }
     }
-    if (op.compare("<=")) {
+    if (op.compare("<=") == 0) {
       if(operand1<=operand2) {
         return 1;
       }
@@ -67,7 +67,7 @@ class ConditionalParser: public Command {
         return 0;
       }
     }
-    if (op.compare(">=")) {
+    if (op.compare(">=") == 0) {
       if(operand1>=operand2) {
         return 1;
       }
