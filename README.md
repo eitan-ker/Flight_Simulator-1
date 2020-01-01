@@ -39,8 +39,7 @@ Clion IDE
 Eitan ker, Meni Ashurov
 
 ## **license**
-This project is licensed under the MIT License
-
+This project is licensed under the Bar-Ilan University license
 ## **Acknowledgments**
 stackoverflow which inspired where we encountered a problem in code and used code from there
 
