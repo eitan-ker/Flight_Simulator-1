@@ -403,6 +403,9 @@ void buildVectorFromString(vector<string>& vec, string& str) {
   vector<string>::iterator it;
   const char* token = &str[0];
   const char* start = &str[0];
+  const char* temp = token;
+  int enter_parenthesis = 0;
+  string e = "",s="";
   regex r1("^[a-zA-Z_$][a-zA-Z_$0-9]*$");
   regex r2("[+-]?([0-9]+([.][0-9]*)?)");
   while(*token != '\0' && *token != '\n' ) {
@@ -419,7 +422,13 @@ void buildVectorFromString(vector<string>& vec, string& str) {
         string c(start,token);
         value = findValueOfVarInMap(c);
         c = to_string(value);
-        vec.emplace(vec.end(),c);
+        if(value<0) {
+          vec.emplace(vec.end(),"(");
+          vec.emplace(vec.end(),c);
+          vec.emplace(vec.end(),")");
+        } else {
+          vec.emplace(vec.end(), c);
+        }
         start=token;
       }
     } else if (isdigit(*token)) {
@@ -431,14 +440,35 @@ void buildVectorFromString(vector<string>& vec, string& str) {
       } else {
         string c(start,token);
         vec.emplace(vec.end(),c);
+        if(enter_parenthesis == 1) {
+          enter_parenthesis = 0;
+          vec.emplace(vec.end(),")");
+        }
         start=token;
       }
     } else {//encoutered operator
-      string e = "";
+      s.clear();
+      e.clear();
+      temp=token;
       e+=(*token);
       it = find(array_of_opearators.begin(),array_of_opearators.end(),e);
       if(it != array_of_opearators.end()) {
+        if(e.compare(")") !=0 && e.compare("(") !=0  ) {
+          temp++;
+          s+=(*temp);
+          it = find(array_of_opearators.begin(),array_of_opearators.end(),s);
+          if(it != array_of_opearators.end()) {
+            if(s.compare(")") !=0 && s.compare("(") !=0  ) {
+              enter_parenthesis = 1;
+            }
+          }
+        }
         vec.emplace(vec.end(),e);
+        if(enter_parenthesis == 1) {
+          vec.emplace(vec.end(),"(");
+          vec.emplace(vec.end(),s);
+          token++;
+        }
         token++;
         start=token;
       } else {
