@@ -87,6 +87,7 @@ class Singleton {
   void InitializationofAllVarsFromXML(); //initialize the map from generic xml map after it was updated by values from game
   map<string,ValueAndNameObject>& getAllVarsFromXMLMMap();// return refernce of AllVarsFromXMLMMap map
   void set_generic_smallMap(string buf_to_value, int sim_index); //initialize the map each time new data comes from the game
+  void deleteAllElementsinOrdersToArrayVector();
   vector<string>& getArrayOfOrdersToServer(); // return refernce of orderToSendToSimulator vector
   ~Singleton(){ //class destructor which frees all of the allocated space in the heap
     map<string,Command*>:: iterator it=strToCommandMap.begin();
@@ -105,6 +106,7 @@ class Singleton {
       it3->second= nullptr;
     }
   }
+  void updateFromSimulatorTable();
 };
 
 #endif //FLIGHTSIMULATOR__SINGLETON_H_

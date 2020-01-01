@@ -12,6 +12,7 @@ void buildVectorFromString(vector<string>& vec, string& str);//helper function t
 float calculateMathExpression(string str);//main function to calculate complex expression, uses "buildVectorFromString" and "getFloatValuefromString" functions
 void gothroughloop(int startofloop, int endofloop); //function to iterate through statement in while\if curly braces from fly.txt
 int WhichMapToPutVariable(string& str);//function to analyze to which map to habit the variable from fly.txt
+void SleepFunc(int sleeptime);
 class Command {
  public:
   virtual int execute(vector<string> &str, int i) = 0;

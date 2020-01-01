@@ -6,7 +6,7 @@ void Server::runServer(int client_socket) {
     string next_buff = "";
     int  sim_index = 0;
     while (1) {
-
+      Singleton *DB = DB->getInstance();
         //reading from client
         char buffer[1024] = {0};
         string value_buf = next_buff;
@@ -18,10 +18,10 @@ void Server::runServer(int client_socket) {
             if ((bufferString[i] == ',') || (buffer[i] == '\n')) {
                 sim_index++;
                 database->set_generic_smallMap(value_buf, sim_index);
-                cout << value_buf << ", ";
+                database->updateFromSimulatorTable();
+//                cout << value_buf << ", ";
                 value_buf = "";
                 if (buffer[i] == '\n') {
-                    cout << endl;
                     sim_index = 0;
                 }
                 continue;

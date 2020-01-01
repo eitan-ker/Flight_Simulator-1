@@ -16,8 +16,8 @@
 #include <cstring>
 
 class Client {
-public:
-    void runClient(int client_socket);
+ public:
+  void runClient(int client_socket);
 };
 
 
