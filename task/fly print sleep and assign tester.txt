@@ -1,0 +1,4 @@
+Print("waiting 2 minutes for gui")
+Sleep(12000)
+Print("let's start")
+warp = 32000+786

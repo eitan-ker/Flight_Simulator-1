@@ -218,9 +218,15 @@ float findValueOfVarInMap(string var) {
         if (t->getsymbolTableFromServerMap().find(var) == t->getsymbolTableToServerMap().end()) {
             throw "error: variable not found";
         } else {
+          if(t->getsymbolTableFromServerMap()[var] == nullptr) {
+            throw "error with " + var;
+          }
             j = t->getsymbolTableFromServerMap()[var]->get_value();
         }
     } else {
+      if(t->getsymbolTableToServerMap()[var] == nullptr) {
+        throw "error with " + var;
+      }
         j = t->getsymbolTableToServerMap()[var]->get_value();
     }
     return j;
@@ -233,14 +239,27 @@ int PrintCommand::execute(vector<string> &str, int i) {
     string temp = str.at(i + 1);
     string str_val = "";
     const char *start = &(temp[0]);
+    const char *tempo = start;
+    int its_an_expression = 0;
     Singleton *t = t->getInstance();
     const char *end = &(temp[temp.size() - 1]);
+    while (*tempo != '\0') {
+      if(*tempo == '-' || *tempo == '+' || *tempo == '/' || *tempo == '*' || *tempo == '(') {
+        its_an_expression++;
+      }
+      tempo++;
+    }
     if (*start == '\"' && *end == '\"') { //print the exp in quotation marks
         temp = temp.substr(1, temp.size() - 2);
         cout << temp << endl;
     } else { //print the variable's value from map
+      if(its_an_expression == 0) {
         str_val = to_string(findValueOfVarInMap(str.at(i + 1)));
         cout << str_val << endl;
+      } else {
+        double d = calculateMathExpression(str.at(i+1));
+        cout << d << endl;
+      }
     }
     return 2;
 }
@@ -282,15 +301,7 @@ int assignCommand::execute(vector<string> &str, int i) {
             break;
         case ISINTOSERVERMAP: {// the variable exists in the symbolTableToServer map
             //send order to game to update the value of the variable according to its sim stored in the DB
-            t->getArrayOfOrdersToServer().emplace(t->getArrayOfOrdersToServer().end(), "set " +
-                                                                                       t->getsymbolTableToServerMap()[str.at(
-                                                                                               i -
-                                                                                               1)]->get_sim().substr(1,
-                                                                                                                     t->getsymbolTableToServerMap()[str.at(
-                                                                                                                             i -
-                                                                                                                             1)]->get_sim().size() -
-                                                                                                                     1) +
-                                                                                       " " + str_val + "\r\n");
+            t->getArrayOfOrdersToServer().emplace(t->getArrayOfOrdersToServer().end(), "set " +t->getsymbolTableToServerMap()[str.at(i -1)]->get_sim().substr(1,t->getsymbolTableToServerMap()[str.at(i -1)]->get_sim().size() -1) +" " + str_val + "\r\n");
             t->getsymbolTableToServerMap()[str.at(i - 1)]->set_value(d);//update the variable pair in map
             string sim_path = t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim();//update the variable pair in map
             t->getAllVarsFromXMLMMap()[sim_path].set_value(d);//update the variable pair in AllVarsFromXMLMMap
@@ -378,17 +389,30 @@ void gothroughloop(int startofloop, int endofloop) { //help to run commands in c
 
 float getFloatValuefromString(const vector<string> &str, int i) { //get value from string wheter variable or float value
     float d = 0;
+    int its_an_expression = 0;
     regex r2("^(-?)(0|([1-9][0-9]*))(\\\\.[0-9]+)?$");
     const char *token = &str.at(i)[0];
     const char *start = token;
+    const char* tempo = token;
     while (*token != '\0' && *token != ' ') {
         token++;
     }
+    while(*start==' ') {
+      start++;
+    }
+  while (*tempo != '\0') {
+    if(*tempo == '-' || *tempo == '+' || *tempo == '/' || *tempo == '*' || *tempo == '(') {
+      its_an_expression++;
+    }
+    tempo++;
+  }
     string c(start, token);
     if (regex_match(start, token, r2)) {
         d = stof(str.at(i));
-    } else {
+    } else if(its_an_expression == 0){
         d = findValueOfVarInMap(str.at(i));
+    } else {
+      d = calculateMathExpression(str.at(i));
     }
     return d;
 }
