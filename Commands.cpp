@@ -88,11 +88,12 @@ void OpenServerCommand::executeServer(int client_socket) {
 
 int ConnectCommand::execute(vector<string> &str, int i) {
 
-    string ip = str[i+1].substr(1, str[i+1].length() - 2);
+
     Singleton *t = t->getInstance();
     t->getArrayOfOrdersToServer(); ///in this case, the getArrayOfOrdersToServer function will have to wait till the Mutex is unlocked
-    string ip_to_connect = str[i + 1];
-    const char *token = &(ip_to_connect[0]);
+    //string ip_to_connect = str[i + 1];
+    string ip = str[i+1].substr(1, str[i+1].length() - 2);
+    const char *token = &(ip[0]);
 //    stringstream strng(str[i + 2]);
 //    int port = 0;
 //    strng >> port;
@@ -112,7 +113,7 @@ int ConnectCommand::execute(vector<string> &str, int i) {
     //We need to create a sockaddr obj to hold address of server
     sockaddr_in address; //in means IP4
     address.sin_family = AF_INET;//IP4
-    address.sin_addr.s_addr = inet_addr("127.0.0.1");  //the localhost address
+    address.sin_addr.s_addr = inet_addr(token);  //the localhost address
     address.sin_port = htons(port);
     //we need to convert our number (both port & localhost)
     // to a number that the network understands.
