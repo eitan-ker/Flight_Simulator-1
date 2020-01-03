@@ -23,7 +23,7 @@ Singleton .cpp
 in this file we wrote all logic to how to interact with DB elements and how to update them. the singleton has only one static instance and no possibility to create another instance. inspired by Singletone Design patten.
 
 Client.cpp
-in this file we wrote all logic related to connect to simulator as a client
+in this file we wrote all logic related to connect to simulator as a client and send "set" commands
 
 Server.cpp
 in this file we wrote all logic on how to open localhost connection for the simulator to connect to the localhost.
