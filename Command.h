@@ -75,6 +75,15 @@ class ConditionalParser: public Command {
         return 0;
       }
     }
+    if (op.compare("!=") == 0) {
+      if(operand1!=operand2) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    return 0;
   }
   virtual ~ConditionalParser(){};
 };

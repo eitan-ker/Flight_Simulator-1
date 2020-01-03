@@ -48,7 +48,6 @@ void check_line(string &line, vector<string> &str_array) {
       start = token;
     }
     if (*token == '(' && after_equal_sign == 0) {
-      int skip_colons = 0;
       AddToVector(start, token, str_array);
       token++;
       start = token;
@@ -99,12 +98,12 @@ void check_line(string &line, vector<string> &str_array) {
     }
     if (*token == '=') {
       if (start != token) {
-        string c(start,token);
-        if (std::find(ops.begin(), ops.end(), c) != ops.end()) {
-          c += *token;
-          str_array.emplace(str_array.end(), c);
+        string k(start,token);
+        if (std::find(ops.begin(), ops.end(), k) != ops.end()) {
+          k += *token;
+          str_array.emplace(str_array.end(), k);
           token++;
-        } else if (c!= " ") {
+        } else if (k!= " ") {
           AddToVector(start,token,str_array);
         }
       }

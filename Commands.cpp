@@ -170,8 +170,6 @@ int SimCommand::execute(vector<string> &str, int i) {
     int j = 0;
     Singleton *t = t->getInstance();//get instance of DB
     string temp = str.at(i + 2);//get the string which is the path of sim
-    const char *start = &(temp[0]);
-    const char *end = &(temp[temp.size() - 1]);
     /*if (*start != '\"' || *end != '\"') {
         throw "invalid command format";
     }*/
@@ -268,7 +266,6 @@ int assignCommand::execute(vector<string> &str, int i) {
     string str_val = "";
     string var = "";
     int notavariable = 0;
-    Var_Data *ptr = nullptr;
     int whichMap = 0;
     Singleton *t = t->getInstance();
     t->setMutexLocked();//lock the DB while update is in proccess
@@ -539,7 +536,6 @@ void buildVectorFromString(vector<string> &vec, string &str) {
  */
 int WhichMapToPutVariable(string &str) {
     Singleton *t = t->getInstance();
-    int whichMap = 0;
     if (t->getsymbolTableToServerMap().find(str) == t->getsymbolTableToServerMap().end()) {
         if (t->getsymbolTableFromServerMap().find(str) == t->getsymbolTableToServerMap().end()) {
             return 0;
