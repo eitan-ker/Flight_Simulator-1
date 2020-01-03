@@ -17,91 +17,138 @@ using namespace std;
 
 void check_line(string &line, vector<string> &str_array);
 
+void AddToVector(const char* start, const char *string1, vector<std::__cxx11::string>& vector);
 void lexer(const char *file_path, vector<string> &str_array);
 
 void parser(vector<string> &str_array);
 
 int main(int argc, char *argv[]);
-
 void check_line(string &line, vector<string> &str_array) {
-    const char *token = &(line[0]);
-    const char *start = token;
-    int foundpattern = 0, enterstringtoarray = 0, skipfound_patternflag=0,check_equal_sign=0;
-    string c;
-    regex r1("[0-9]*[.][ ]");
-    if (*token == '/') { //encountered comment
-        token++;
-        if (*token == '/') {
-            return;
-        }
+  vector<string> ops ={"<",">","!"};
+  const char *token = &(line[0]);
+  const char *start = token;
+  const char *temp = token;
+  int is_in_quotation = 0;
+  int open_parenthesis = 0, after_equal_sign = 0;
+  string c;
+  regex r1("[0-9]*[.][ ]");
+  if (*token == '/') { //encountered comment
+    token++;
+    if (*token == '/') {
+      return;
     }
-    start = token;
-    while (*token != '\0' && *token != '\n' && *token != '\r') { //start iterating over the line char by chaar
-      skipfound_patternflag=0; // first of all at each iteration zero the found word flag
-        if (*token == '\t') {//encountered tab
-            token++;
-            start = token;
-        }
-        if(check_equal_sign==1) {//encountered equal sign at last iteration, now take everything after it and put it as one string
-          check_equal_sign=0;
-          start=token;
-          while(*token!='\n' && *token!='{' && *token!='}' && *token != '\0' ) {
-            token++;
-          }
-          foundpattern++;
-        }
-        if( *token == '\"') {//encountered comment in the middle of analyzing the string
-          start=token;
+  }
+  while(*token == '\t' || *token == ' ') {
+    token++;
+  }
+  start = token;
+  while (*token != '\0' && *token != '\n' && *token != '\r') { //start iterating over the line char by chaar
+    if (*token == '\t') {
+      token++;
+      start = token;
+    }
+    if (*token == '(' && after_equal_sign == 0) {
+      AddToVector(start, token, str_array);
+      token++;
+      start = token;
+      open_parenthesis++;
+      while (open_parenthesis > 0) {
+        if(*token == '\"' && is_in_quotation==0) {
+          is_in_quotation++;
           token++;
-          while(*token !='\"') {
-            token++;
-          }
-          skipfound_patternflag=1; //dont insert this string to the string vector
         }
-        if (*token == ' '  || *token == '(' || *token == ')' || *token == ',') { //if i encounter one of these sign, i put everything i gathered until these sign and add to vector
-            foundpattern = 1;
+        if(*token == '\"' && is_in_quotation==1) {
+          is_in_quotation--;
         }
-        if (foundpattern == 1 && skipfound_patternflag==0) {//i have now a start char and end char and i want to make a string out of them and push to my string vector
-            foundpattern = 0;
-            enterstringtoarray = 1;
-            string key_str(start, token);
-            c = key_str;
-            if (c.compare("////") != 0 && c.compare("") != 0) {
-              if(c == "=" || c=="<=" || c==">=") {
-                check_equal_sign=1;
-              }
-                str_array.insert(str_array.end(), c);
-              if(*token!='\0' && *token!='{' && *token!='}') {
-                token++;
-              }
-              if(*token=='{') {//insert curly braces to vector
-                c = "{";
-                str_array.insert(str_array.end(), c);
-                token++;
-                start=token;
-              }
-              if(*token=='}') { //insert curly braces to vector
-                c = "}";
-                str_array.insert(str_array.end(), c);
-                token++;
-                start=token;
-              }
-                start = token;
-            } else {
-                return;
-            }
+        if (*token == ',' && is_in_quotation == 0) {
+          AddToVector(start, token, str_array);
+          token++;
+          start = token;
         }
-        if (enterstringtoarray == 0) {
-            token++;
-        } else {
-            enterstringtoarray = 0;
+        if (*token == '(') {
+          open_parenthesis++;
+        } else if (*token == ')') {
+          open_parenthesis--;
         }
+        token++;
+      }
+      string r(start, token);
+      r = r.substr(0, r.size() - 1);
+      const char *s = &r[0];
+      const char *t = &r[r.size()];
+      AddToVector(s, t, str_array);
+      start = token;
     }
-    string key_str(start, token);
-    if (start != token && *start != '\0') {
-        c = key_str;
-        str_array.insert(str_array.end(), c);
+    if (*token == '{' || *token == '}') {
+      AddToVector(start, token, str_array);
+      if (*token == '{') {
+        str_array.emplace(str_array.end(), "{");
+      } else {
+        str_array.emplace(str_array.end(), "}");
+      }
+      token++;
+      start = token;
     }
+    if (*token == ' ' && after_equal_sign == 0) {
+      if (start != token) {
+        AddToVector(start,token,str_array);
+      }
+      token++;
+      start = token;
+    }
+    if (*token == '=') {
+      if (start != token) {
+        string k(start,token);
+        if (std::find(ops.begin(), ops.end(), k) != ops.end()) {
+          k += *token;
+          str_array.emplace(str_array.end(), k);
+          token++;
+        } else if (k!= " ") {
+          AddToVector(start,token,str_array);
+        }
+      }
+      if(*token == ' ') {
+        token++;
+      }
+      temp=token;
+      temp++;
+      if(*temp == '=' && *token == '=') {
+        str_array.emplace(str_array.end(), "==");
+        token++;
+        token++;
+      } else if (*temp=='=' && *token!='=') {
+        str_array.emplace(str_array.end(), "=");
+        token++;
+        token++;
+      } else if (*token == '=') {
+        str_array.emplace(str_array.end(), "=");
+        token++;
+        if(*token == ' ') {
+          token++;
+        }
+        start = token;
+      }
+      if(*token == ' ') {
+        token++;
+      }
+      after_equal_sign++;
+      start = token;
+    }
+    if (*token != '\0') {
+      token++;
+    }
+  }
+  if (start != token && *start != '\0') {
+    AddToVector(start,token,str_array);
+  }
+}
+void AddToVector(const char *start, const char *token, vector<std::__cxx11::string>& str_array) {
+  if(start!=token) {
+    string c(start, token);
+    if(c!= " " || c.compare("\"")!=0) {
+      str_array.emplace(str_array.end(), c);
+    }
+  }
 }
 
 void lexer(const char *file_path, vector<string> &str_array) {
@@ -132,7 +179,6 @@ void parser(vector<string> &str_array) {
     } else {
       i += (*c).execute(str_array, i);
     }
-
   }
 }
 

@@ -11,7 +11,7 @@ void Server::runServer(int client_socket) {
         char buffer[1024] = {0};
         string value_buf = next_buff;
         int valread = read(client_socket, buffer, 1024);
-        int i = 0, counter = 0;
+        int i = 0;
         string bufferString = buffer;
         // send 1024 bites of buffer - info required is 328 bites
         for (i = 0; i < valread; i++) {

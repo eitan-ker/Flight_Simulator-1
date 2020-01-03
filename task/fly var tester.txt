@@ -1,0 +1,3 @@
+var warp -> sim("/sim/time/warp")
+var heading <- sim("/instrumentation/heading-indicator/offset-deg")
+
