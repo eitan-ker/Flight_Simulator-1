@@ -172,9 +172,9 @@ int SimCommand::execute(vector<string> &str, int i) {
     string temp = str.at(i + 2);//get the string which is the path of sim
     const char *start = &(temp[0]);
     const char *end = &(temp[temp.size() - 1]);
-    if (*start != '\"' || *end != '\"') {
+    /*if (*start != '\"' || *end != '\"') {
         throw "invalid command format";
-    }
+    }*/
 
     temp = temp.substr(1, temp.size() - 2);
     string binding = str.at(i);

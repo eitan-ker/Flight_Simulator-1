@@ -28,6 +28,7 @@ void check_line(string &line, vector<string> &str_array) {
   const char *token = &(line[0]);
   const char *start = token;
   const char *temp = token;
+  int is_in_quotation = 0;
   int open_parenthesis = 0, after_equal_sign = 0;
   string c;
   regex r1("[0-9]*[.][ ]");
@@ -53,7 +54,14 @@ void check_line(string &line, vector<string> &str_array) {
       start = token;
       open_parenthesis++;
       while (open_parenthesis > 0) {
-        if (*token == ',') {
+        if(*token == '\"' && is_in_quotation==0) {
+          is_in_quotation++;
+          token++;
+        }
+        if(*token == '\"' && is_in_quotation==1) {
+          is_in_quotation--;
+        }
+        if (*token == ',' && is_in_quotation == 0) {
           AddToVector(start, token, str_array);
           token++;
           start = token;
@@ -138,7 +146,9 @@ void check_line(string &line, vector<string> &str_array) {
 void AddToVector(const char *start, const char *token, vector<std::__cxx11::string>& str_array) {
   if(start!=token) {
     string c(start, token);
-    str_array.emplace(str_array.end(), c);
+    if(c!= " " || c.compare("\"")!=0) {
+      str_array.emplace(str_array.end(), c);
+    }
   }
 }
 
