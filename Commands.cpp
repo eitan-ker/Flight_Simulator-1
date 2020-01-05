@@ -26,7 +26,7 @@ int OpenServerCommand::execute(vector<string> &str, int i) {
 //    stringstream strng(str[i + 1]);
 //    int port = 0;
 //    strng >> port;
-    float port_num= calculateMathExpression(str[i+1]);
+    float port_num = calculateMathExpression(str[i + 1]);
     int port = port_num;
     if (port_num - port > 0) {
         std::cerr << "invalid port number" << std::endl;
@@ -76,28 +76,30 @@ int OpenServerCommand::execute(vector<string> &str, int i) {
     // will open thread to run infinite loop of recieving data from game
     thread ods(&OpenServerCommand::executeServer, this, client_socket);
     ods.detach();
+    // close(client_socket);
+
     return 2;
 //    close(socketfd); //closing the listening socket
 }
 
 
 void OpenServerCommand::executeServer(int client_socket) {
-    Server *server = new Server();
+    Server *server = new Server(client_socket);
     server->runServer(client_socket);
+    server->~Server();
 }
 
+
 int ConnectCommand::execute(vector<string> &str, int i) {
-
-
     Singleton *t = t->getInstance();
     t->getArrayOfOrdersToServer(); ///in this case, the getArrayOfOrdersToServer function will have to wait till the Mutex is unlocked
     //string ip_to_connect = str[i + 1];
-    string ip = str[i+1].substr(1, str[i+1].length() - 2);
+    string ip = str[i + 1].substr(1, str[i + 1].length() - 2);
     const char *token = &(ip[0]);
 //    stringstream strng(str[i + 2]);
 //    int port = 0;
 //    strng >> port;
-    float port_num= calculateMathExpression(str[i+2]);
+    float port_num = calculateMathExpression(str[i + 2]);
     int port = port_num;
     if (port_num - port > 0) {
         std::cerr << "invalid port number" << std::endl;
@@ -130,14 +132,17 @@ int ConnectCommand::execute(vector<string> &str, int i) {
     // thread maker
     thread cc(&ConnectCommand::executeConnect, this, client_socket);
     cc.detach();
+    //   close(client_socket);
 
 
     return 3;
 }
 
 void ConnectCommand::executeConnect(int client_socket) {
-    Client *client = new Client();
+    Client *client = new Client(client_socket);
     client->runClient(client_socket);
+    client->~Client();
+
 }
 
 int DefineVarCommand::execute(vector<string> &str, int i) {
@@ -216,15 +221,15 @@ float findValueOfVarInMap(string var) {
         if (t->getsymbolTableFromServerMap().find(var) == t->getsymbolTableToServerMap().end()) {
             throw "error: variable not found";
         } else {
-          if(t->getsymbolTableFromServerMap()[var] == nullptr) {
-            throw "error with " + var;
-          }
+            if (t->getsymbolTableFromServerMap()[var] == nullptr) {
+                throw "error with " + var;
+            }
             j = t->getsymbolTableFromServerMap()[var]->get_value();
         }
     } else {
-      if(t->getsymbolTableToServerMap()[var] == nullptr) {
-        throw "error with " + var;
-      }
+        if (t->getsymbolTableToServerMap()[var] == nullptr) {
+            throw "error with " + var;
+        }
         j = t->getsymbolTableToServerMap()[var]->get_value();
     }
     return j;
@@ -242,22 +247,22 @@ int PrintCommand::execute(vector<string> &str, int i) {
     Singleton *t = t->getInstance();
     const char *end = &(temp[temp.size() - 1]);
     while (*tempo != '\0') {
-      if(*tempo == '-' || *tempo == '+' || *tempo == '/' || *tempo == '*' || *tempo == '(') {
-        its_an_expression++;
-      }
-      tempo++;
+        if (*tempo == '-' || *tempo == '+' || *tempo == '/' || *tempo == '*' || *tempo == '(') {
+            its_an_expression++;
+        }
+        tempo++;
     }
     if (*start == '\"' && *end == '\"') { //print the exp in quotation marks
         temp = temp.substr(1, temp.size() - 2);
         cout << temp << endl;
     } else { //print the variable's value from map
-      if(its_an_expression == 0) {
-        str_val = to_string(findValueOfVarInMap(str.at(i + 1)));
-        cout << str_val << endl;
-      } else {
-        double d = calculateMathExpression(str.at(i+1));
-        cout << d << endl;
-      }
+        if (its_an_expression == 0) {
+            str_val = to_string(findValueOfVarInMap(str.at(i + 1)));
+            cout << str_val << endl;
+        } else {
+            double d = calculateMathExpression(str.at(i + 1));
+            cout << d << endl;
+        }
     }
     return 2;
 }
@@ -298,7 +303,15 @@ int assignCommand::execute(vector<string> &str, int i) {
             break;
         case ISINTOSERVERMAP: {// the variable exists in the symbolTableToServer map
             //send order to game to update the value of the variable according to its sim stored in the DB
-            t->getArrayOfOrdersToServer().emplace(t->getArrayOfOrdersToServer().end(), "set " +t->getsymbolTableToServerMap()[str.at(i -1)]->get_sim().substr(1,t->getsymbolTableToServerMap()[str.at(i -1)]->get_sim().size() -1) +" " + str_val + "\r\n");
+            t->getArrayOfOrdersToServer().emplace(t->getArrayOfOrdersToServer().end(), "set " +
+                                                                                       t->getsymbolTableToServerMap()[str.at(
+                                                                                               i -
+                                                                                               1)]->get_sim().substr(1,
+                                                                                                                     t->getsymbolTableToServerMap()[str.at(
+                                                                                                                             i -
+                                                                                                                             1)]->get_sim().size() -
+                                                                                                                     1) +
+                                                                                       " " + str_val + "\r\n");
             t->getsymbolTableToServerMap()[str.at(i - 1)]->set_value(d);//update the variable pair in map
             string sim_path = t->getsymbolTableToServerMap()[str.at(i - 1)]->get_sim();//update the variable pair in map
             t->getAllVarsFromXMLMMap()[sim_path].set_value(d);//update the variable pair in AllVarsFromXMLMMap
@@ -390,26 +403,26 @@ float getFloatValuefromString(const vector<string> &str, int i) { //get value fr
     regex r2("^(-?)(0|([1-9][0-9]*))(\\\\.[0-9]+)?$");
     const char *token = &str.at(i)[0];
     const char *start = token;
-    const char* tempo = token;
+    const char *tempo = token;
     while (*token != '\0' && *token != ' ') {
         token++;
     }
-    while(*start==' ') {
-      start++;
+    while (*start == ' ') {
+        start++;
     }
-  while (*tempo != '\0') {
-    if(*tempo == '-' || *tempo == '+' || *tempo == '/' || *tempo == '*' || *tempo == '(') {
-      its_an_expression++;
+    while (*tempo != '\0') {
+        if (*tempo == '-' || *tempo == '+' || *tempo == '/' || *tempo == '*' || *tempo == '(') {
+            its_an_expression++;
+        }
+        tempo++;
     }
-    tempo++;
-  }
     string c(start, token);
     if (regex_match(start, token, r2)) {
         d = stof(str.at(i));
-    } else if(its_an_expression == 0){
+    } else if (its_an_expression == 0) {
         d = findValueOfVarInMap(str.at(i));
     } else {
-      d = calculateMathExpression(str.at(i));
+        d = calculateMathExpression(str.at(i));
     }
     return d;
 }

@@ -10,7 +10,15 @@
 #include "Singleton.h"
 
 class Server {
+private:
+    int client_socket;
  public:
+    Server(int sock_num) {
+        this->client_socket = sock_num;
+    }
+    ~Server() {
+        close(client_socket);
+    }
   void runServer(int client_socket);
 };
 
