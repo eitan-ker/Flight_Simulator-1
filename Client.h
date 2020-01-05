@@ -16,8 +16,16 @@
 #include <cstring>
 
 class Client {
- public:
-  void runClient(int client_socket);
+private:
+    int client_socket;
+public:
+    Client(int sock_num) {
+        this->client_socket = sock_num;
+    }
+    ~Client() {
+        close(client_socket);
+    }
+    void runClient(int client_socket);
 };
 
 
