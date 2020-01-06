@@ -44,6 +44,5 @@ void Client::runClient(int client_socket) {
 //    int valread = read( client_socket , buffer, 1024);
 //    std::cout<<buffer<<std::endl;`*/
 
-  //close(client_socket);
 
 }
