@@ -17,13 +17,13 @@
 
 class Client {
 private:
-    int client_socket;
+    int sock_num;
 public:
-    Client(int sock_num) {
-        this->client_socket = sock_num;
+    Client(int client_socket) {
+        this->sock_num = client_socket;
     }
     ~Client() {
-        close(client_socket);
+        close(sock_num);
     }
     void runClient(int client_socket);
 };

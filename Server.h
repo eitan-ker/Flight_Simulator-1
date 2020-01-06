@@ -11,13 +11,13 @@
 
 class Server {
 private:
-    int client_socket;
+    int sock_num;
  public:
-    Server(int sock_num) {
-        this->client_socket = sock_num;
+    Server(int client_socket) {
+        this->sock_num = client_socket;
     }
     ~Server() {
-        close(client_socket);
+        close(sock_num);
     }
   void runServer(int client_socket);
 };
