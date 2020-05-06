@@ -37,7 +37,7 @@ Clion IDE
 
 #### **Authors**
 
-Eitan ker, Meni Ashurov
+Eitan kerzhner, Meni Ashurov
 
 ## **license**
 This project is licensed under the Bar-Ilan University license
