@@ -1,4 +1,4 @@
-link to git repo :https://github.com/menimen/Flight_Simulator
+link to git repo :https://github.com/eitan-ker/Flight_Simulator-1
 # Flight_Simulator
 project given in c++ in "Advenced_programming" course in Sophmore year. 
 the project is about learning how to connect to flight simulator application as a client and open local host server so that the simulator can connect to local host in order to exchange data between the host and the simulator and practice working in multithreading environment so that eventually with the right data combined togheter, the plane will fly.
